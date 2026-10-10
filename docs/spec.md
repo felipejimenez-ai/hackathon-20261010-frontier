@@ -143,6 +143,40 @@ observado: formato de control (`E201`) → comando desconocido (`E301`) → arid
 
 ---
 
+## 8. Cómo aprende el sistema (método)
+
+El reemplazo no "adivina" el servicio: **infiere reglas** de los datos y las aterriza en el sistema.
+Dos tipos de aprendizaje:
+
+- **Aprender patrones (inferir la regla).** Bucle: *observar* pares (entrada→salida) → *hipótesis* de
+  la forma de la regla → *medir* aislando una variable → *ajustar* parámetros → *verificar* contra
+  **todos** los aciertos y rechazos conocidos → *codificar*. Ejemplo: el checksum. La señal fue el
+  `+3` sistemático al medir mod 100 sobre una magnitud mod 97, lo que reveló el módulo correcto.
+- **Aprender comportamientos (detectar el cambio).** *Testing diferencial* contra el oráculo v1
+  (los ejemplos + el log + la réplica validada 20/20): se envían mensajes cuyo resultado en v1 se
+  conoce y se compara con la respuesta viva; cada diferencia es un cambio candidato.
+
+**Dónde vive cada aprendizaje.** Según qué tan cerrado esté:
+
+| Aprendizaje | Dónde vive | Ejemplo |
+|---|---|---|
+| Valor/parámetro | `src/config.mjs` (datos) | límite de transferencia, prefijos, typo `recieved`, constante del checksum, tabla de errores |
+| Regla/función | módulo/handler | `checksum.mjs`, `id = prefijo + pad(secuencia,4)`, dispatch de comandos |
+| Tabla medida (regla no cerrada) | `src/known-controls.mjs` | 84 pares (cuerpo → control) medidos |
+
+**Garantías del método.**
+1. *Parámetros como datos*: aprender algo nuevo es cambiar un valor, no reescribir lógica.
+2. *Niveles de confianza* (`confirmado` / `probable` / `supuesto`): lo medido nunca se mezcla con lo asumido.
+3. *Gate* (`tools/gate.mjs`): cada aprendizaje se re-verifica contra toda la evidencia conocida; evita que
+   aprender algo rompa lo anterior.
+4. *Oráculo v1*: la réplica validada 20/20 permite aprender v2 buscando solo **diferencias**, no reconstruir.
+
+**Flujo ante el incidente (v2).** Diferencial → registrar el diff en `experimentos.jsonl`
+(`hipotesis` + `conclusion`) → nuevo valor en `config` (perfil v2; v1 se conserva para regresión) →
+correr el gate y `tools/live-check.mjs` → redesplegar → corrida de conformidad.
+
+---
+
 ### Nota de reimplementación
 El reemplazo (`src/server.mjs`) implementa esta especificación como una pipeline: Entrada → Token
 Router → Parser → Integridad → Dispatcher → Handlers → Token Store → Serializer, con los parámetros
