@@ -1,21 +1,156 @@
-@host = https://caja-negra-production-c64f.up.railway.app
-@token = {{$.env CAJA_NEGRA_TOKEN}}
-@token2 = {{$.env CAJA_NEGRA_TOKEN_2}}
-@entrypoint_token = {{$.env ENTRYPOINT_TOKEN}}
+@original  = https://caja-negra-production-c64f.up.railway.app
+@replica   = https://hackathon-20261010-frontier-production.up.railway.app
 
-### health
-GET {{host}}/health
+# tokens desde .env
+@origToken = {{$dotenv CAJA_NEGRA_TOKEN}}
+@teamToken = {{$dotenv ENTRYPOINT_TOKEN}}
 
-### ping
-POST {{host}}/msg
-Authorization: Bearer {{token}}
-Content-Type: application/json
+@ct = application/json
+
+###############################################################################
+# HEALTH  (no necesita token)
+###############################################################################
+
+### réplica health
+GET {{replica}}/health
+
+### original health
+GET {{original}}/health
+
+###############################################################################
+# RESET  (vacía el estado del token — manda esto ANTES de cada secuencia)
+###############################################################################
+
+### réplica reset
+POST {{replica}}/__reset
+Authorization: Bearer {{teamToken}}
+
+### original reset   (da 401 después de las 20:00)
+POST {{original}}/__reset
+Authorization: Bearer {{origToken}}
+
+###############################################################################
+# SECUENCIA VÁLIDA  (manda en este orden, tras el reset)
+###############################################################################
+
+### 1. PING
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
 
 {"m":"PING;64"}
 
-### alta
-POST {{host}}/msg
-Authorization: Bearer {{token}}
-Content-Type: application/json
+### 2. ALTA Lucia  -> 201 AC-0001
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
 
 {"m":"ALTA;Lucia;82"}
+
+### 3. CONSULTA AC-0001 -> saldo 0
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"CONSULTA;AC-0001;14"}
+
+### 4. DEPOSITO 250000 -> recieved (typo incluido)
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"DEPOSITO;AC-0001;250000;86"}
+
+### 5. TRANSFER 40000 -> recieved
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"TRANSFER;AC-0001;AC-0002;40000;86"}
+
+### 6. ANULA OP-0002 -> ok true
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"ANULA;OP-0002;66"}
+
+### 7. ANULA OP-0002 otra vez -> ok false "ya anulada"
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"ANULA;OP-0002;66"}
+
+###############################################################################
+# ERRORES  (cada uno prueba un código distinto)
+###############################################################################
+
+### E202 control inválido
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"ALTA;Lucia;83"}
+
+### E201 control mal formado
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"DEPOSITO;AC-0002;700;5X"}
+
+### E301 comando desconocido (espacio final)
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"SALDOS;AC-0001;38"}
+
+### E302 aridad inválida
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"ALTA;Lucia;Gomez;11"}
+
+### E401 cuenta inexistente
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"CONSULTA;AC-0009;87"}
+
+### E506 límite excedido
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"TRANSFER;AC-0001;AC-0002;120000;55"}
+
+### E507 saldo insuficiente
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"TRANSFER;AC-0002;AC-0001;50000;23"}
+
+###############################################################################
+# CASOS ESPECIALES
+###############################################################################
+
+### ruta inexistente -> E404
+GET {{replica}}/nope
+
+### token malo -> E001
+POST {{replica}}/msg
+Authorization: Bearer token-falso
+Content-Type: {{ct}}
+
+{"m":"PING;64"}
+
+### sin token -> E001
+POST {{replica}}/msg
+Content-Type: {{ct}}
+
+{"m":"PING;64"}

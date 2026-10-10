@@ -24,6 +24,8 @@ Todos los mensajes viajan en `POST /msg` con cuerpo JSON `{"m": "CMD;arg;...;con
 | IN-6 | Token ausente o erróneo → `401 {"error":"E001","mensaje":"no autorizado"}`. | sin-token (9000–9012) | confirmado |
 | IN-7 | Ruta o método inexistente → `404 {"error":"E404","mensaje":"ruta desconocida"}`; se resuelve **antes** de auth. | sin-token (9003, 9007–9011) | confirmado |
 | IN-8 | Límite de infraestructura: 10 req/s y 8000 req/día por token; al exceder responde con header `X-Frontier-Infra: rate-limit` (infra, no servicio). | contrato (README) | confirmado |
+| IN-17 | El `control` tiene **1–2 dígitos** (`100` → `E201` mal formado); sin ceros a la izquierda; válidos observados 3..98. | incidente:probe2 | confirmado |
+| IN-18 | Cuerpo de `POST /msg`: JSON inválido o vacío → `E100`; JSON válido sin `m` string → `E102`. | incidente:probe2 | confirmado |
 
 ## 2. Integridad
 
@@ -122,6 +124,9 @@ observado: formato de control (`E201`) → comando desconocido (`E301`) → arid
 | ER-13 | 400 | `{"error":"E103","mensaje":"falta control"}` (mensaje sin `;`, sin campo control). | probe-v2 | confirmado |
 | ER-14 | 400 | `{"error":"E303","mensaje":"monto inválido"}` (monto no válido; antes de E401). | incidente:explorar, probe-v2 | confirmado |
 | ER-15 | — | **v2:** el control (E201/E202) se evalúa **antes** de comando (E301) y aridad (E302); `PING` ignora el control pero exige su presencia (E103/E104) y aridad 0. | incidente:explorar | confirmado |
+| ER-16 | 400 | `{"error":"E100","mensaje":"json inválido"}` (cuerpo vacío o JSON inválido). | incidente:probe2 | confirmado |
+| ER-17 | 400 | `{"error":"E102","mensaje":"falta m"}` (JSON válido sin `m` string: `null`, `{}`, `{"m":5}`). | incidente:probe2 | confirmado |
+| ER-18 | 400 | `{"error":"E304","mensaje":"origen y destino iguales"}` (TRANSFER con misma cuenta). Orden: E303 → E304 → E401 → E506 → E507. | incidente:probe3/4 | confirmado |
 | ER-11 | 401 | `{"error":"E001","mensaje":"no autorizado"}` (token ausente/erróneo). | sin-token | confirmado |
 | ER-12 | 404 | `{"error":"E404","mensaje":"ruta desconocida"}` (ruta/método inexistente; antes de auth). | sin-token | confirmado |
 
