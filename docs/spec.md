@@ -21,8 +21,8 @@ Todos los mensajes viajan en `POST /msg` con cuerpo JSON `{"m": "CMD;arg;...;con
 | IN-3 | El comando principal es `POST /msg` con cuerpo JSON `{"m":"..."}`. | 1–20 | confirmado |
 | IN-4 | El mensaje se parte por `;`; el **último** campo es el `control`. | 1–20 | confirmado |
 | IN-5 | Todo request lleva `Authorization: Bearer <token>`; el estado es aislado por token. | contrato (README) | confirmado |
-| IN-6 | Token ausente/erróneo: el servicio responde como el original (aún no observado). | — | supuesto |
-| IN-7 | Rutas/métodos inexistentes: el servicio responde como el original (aún no observado). | — | supuesto |
+| IN-6 | Token ausente o erróneo → `401 {"error":"E001","mensaje":"no autorizado"}`. | sin-token (9000–9012) | confirmado |
+| IN-7 | Ruta o método inexistente → `404 {"error":"E404","mensaje":"ruta desconocida"}`; se resuelve **antes** de auth. | sin-token (9003, 9007–9011) | confirmado |
 | IN-8 | Límite de infraestructura: 10 req/s y 8000 req/día por token; al exceder responde con header `X-Frontier-Infra: rate-limit` (infra, no servicio). | contrato (README) | confirmado |
 
 ## 2. Integridad
@@ -38,16 +38,12 @@ El comando `PING` **omite** la validación de integridad. Para el resto:
 | IN-13 | El `control` es un entero `0..99` en forma **sin ceros a la izquierda** (`ALTA;Mateo;3` válido, `ALTA;Mateo;03` inválido). | 4 | confirmado |
 | IN-14 | El `control` es un checksum determinista del mensaje, **independiente del estado/contador**. | 3, 4 | confirmado |
 
-**Modelo del checksum (en investigación).** El control es una función **aditiva** por carácter:
-`control = (K + Σ v(charᵢ) · w[distanciaᵢ]) mod 100`, donde `distancia` = distancia desde el final.
-Se comprobó separabilidad (dos cambios suman exactamente) y se midieron `w1..w20`. La función de
-valor por carácter no quedó cerrada. **Mientras no se valide al 100 % de aciertos, el reemplazo usa
-modo *lenient*: acepta cualquier control numérico** (documentado como supuesto S-1).
+**Modelo del checksum (propuesto, no cerrado).** El control usa módulo **97** (rango válido observado 3..98), no 100: `control = 98 − r`, con `r = (K + Σ v(charᵢ)·w[distanciaᵢ]) mod 97`, pesos `w_d = −3·10^(d−1) mod 97` (Horner en base 10) y caracteres en mayúsculas. El valor no quedó cerrado (69/87 pares). **Modo *híbrido*: el reemplazo solo aplica `E202` a cuerpos cuyo control se conoce** (tabla medida de 84 cuerpos + modelo `CONSULTA;AC-####`); el resto queda *lenient* (acepta cualquier control numérico), documentado como supuesto S-1.
 
 | ID | Comportamiento | Evidencia | Confianza |
 |----|----------------|-----------|-----------|
-| IN-15 | El control es un checksum aditivo determinista del mensaje. | 1–120 | probable |
-| IN-16 | Reemplazo por defecto: acepta cualquier control numérico → solo rechaza formato (`E201`). | 1–20 | supuesto |
+| IN-15 | El control es un checksum determinista de módulo 97 del mensaje (Horner base 10). | 1–120 | probable |
+| IN-16 | Modo *híbrido*: `E202` solo para cuerpos con control conocido (tabla + modelo CONSULTA); el resto acepta cualquier control numérico. | 1–20, sin-token | confirmado |
 
 ## 3. Comandos
 
@@ -118,11 +114,12 @@ observado: formato de control (`E201`) → comando desconocido (`E301`) → arid
 | ER-3 | 400 | `{"error":"E202","mensaje":"control inválido"}` | 2 | confirmado |
 | ER-4 | 400 | `{"error":"E301","mensaje":"comando desconocido "}` (espacio final incluido) | 12 | confirmado |
 | ER-5 | 400 | `{"error":"E302","mensaje":"aridad inválida"}` | 20 | confirmado |
-| ER-6 | 404 | `{"error":"E401","mensaje":"cuenta inexistente"}` | 15, 1149 | confirmado |
-| ER-7 | 404 | `{"error":"E402","mensaje":"operación inexistente"}` | 1687 | confirmado |
+| ER-6 | 404 | `{"error":"E401","mensaje":"cuenta inexistente"}` | 15, 1149 | confirmado || ER-7 | 404 | `{"error":"E402","mensaje":"operación inexistente"}` | 1687 | confirmado |
 | ER-8 | 422 | `{"error":"E506","mensaje":"límite excedido"}` | 9 | confirmado |
 | ER-9 | 422 | `{"error":"E507","mensaje":"saldo insuficiente"}` | 16 | confirmado |
 | ER-10 | — | Precedencia: `E506` antes que `E507`; `E301`/`E302` con control válido. | 9, 12, 20 | confirmado |
+| ER-11 | 401 | `{"error":"E001","mensaje":"no autorizado"}` (token ausente/erróneo). | sin-token | confirmado |
+| ER-12 | 404 | `{"error":"E404","mensaje":"ruta desconocida"}` (ruta/método inexistente; antes de auth). | sin-token | confirmado |
 
 ## 6. Cambios durante el día
 
@@ -131,6 +128,8 @@ observado: formato de control (`E201`) → comando desconocido (`E301`) → arid
 | CA-1 | Los ejemplos se grabaron con la versión de la mañana; el servicio puede cambiar parámetros durante el día (evento ~15:00). | contrato (README) | confirmado |
 | CA-2 | Los parámetros vulnerables (límite de transferencia, prefijos, checksum) se aíslan en `src/config.mjs` para actualizarlos como datos, no como código. | diseño (`docs/design/system-design.md`) | supuesto |
 | CA-3 | No se detectó ningún cambio de parámetro durante la recon (todas las mediciones fueron estables). | 1–7896 | probable |
+| CA-4 | Incidente v2 (~15:30): el proveedor desplegó la versión 2 con 3 comportamientos cambiados. Auth y rutas se midieron contra el servicio en vivo (v2): `401 E001` y `404 E404`. | sin-token (9000–9012), ticket FR-0153 | confirmado |
+| CA-5 | Estrategia de detección: un canario compara el servicio en vivo contra la réplica v1 (validada 20/20) con controles válidos conocidos; cualquier diferencia es candidata a cambio. Pendiente de token para ejecutarlo. | — | supuesto |
 
 ## 7. Riesgos
 
