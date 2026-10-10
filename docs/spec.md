@@ -41,16 +41,20 @@ Todos los mensajes viajan en `POST /msg` con `{"m": "CMD;arg;...;control"}` y he
 | IN-14 | El control es un checksum determinista e **independiente del estado**. | 3, 4 | confirmado |
 | IN-19 | El control (E201/E202) se evalúa **antes** que comando (E301) y aridad (E302). | incidente:explorar | confirmado |
 
-**Modelo del checksum (mod 97, casi cerrado).**
-`control = 98 − r`, `r = (K + Σ v(char)·w) mod 97`, con `w = 10^(nº de caracteres no separadores después de la posición)`.
-Los caracteres **`;` y `-` son aditivos** (no multiplican por 10); el **comando se pasa a mayúsculas, los argumentos no**.
-Dígitos `v(d)=d`. Con esto, **90/90** pares de cuerpos de igual longitud que difieren solo en dígitos son consistentes
-(incluye TRANSFER). No se cierran todas las letras, así que el reemplazo usa modo **híbrido**.
+**Modelo del checksum (mod 97, NO cerrado).**
+`control = 98 − r`; pesos de posición confirmados como `w = 10^(nº de caracteres no separadores después)`
+(verificado con deltas `A→B` en `AAA;AAA`: posiciones dan `3·10^k mod 97`). El **cuerpo se pasa a mayúsculas
+por completo**: medido que `CONSULTA;A` = `CONSULTA;a` (mismo control), `;`/`-` no cuentan como posición.
+`CONSULTA;AC-####` se predice bien en todas las posiciones de dígito.
+Sin embargo, un modelo lineal de valores por carácter **falla para cuerpos con letras repetidas o de varias
+letras** (`CONSULTA;J`=98 pero `CONSULTA;JJ`=68, `CONSULTA;AJ`=68): la combinación no es lineal, así que
+**no se cerró** la fórmula completa. El reemplazo usa modo **híbrido**.
 
 | ID | Comportamiento | Evidencia | Confianza |
 |----|----------------|-----------|-----------|
-| IN-15 | Checksum determinista de módulo 97; `;` y `-` aditivos; argumentos distinguen mayúscula. | 1–120 | probable |
+| IN-15 | Checksum determinista de módulo 97; pesos `10^(no-sep-after)`; cuerpo a mayúsculas (args incluidos); `;`/`-` no aportan posición. | sweep-case, probe-weights, probe-combo | confirmado |
 | IN-16 | Modo *híbrido*: `E202` solo para cuerpos con control conocido (tabla medida + modelo `CONSULTA;AC-####`, validado en todas las posiciones de dígito); el resto *lenient*. | 1–20, incidente:probe2 | confirmado |
+| IN-17 | La combinación de caracteres **no es lineal**: `A→B` en una posición cambia el control en `3·10^k`, pero cuerpos con un carácter repetido no siguen ese modelo. Fórmula completa no cerrada. | probe-weights, probe-runs | probable |
 
 ## 3. Comandos
 
