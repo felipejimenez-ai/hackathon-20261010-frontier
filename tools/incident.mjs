@@ -17,7 +17,7 @@ const call = async (m) => {
 };
 const reset = () => fetch(URL + "/__reset", { method: "POST", headers: H });
 
-const SAMPLES = JSON.parse(fs.readFileSync("pruebas/ejemplos.jsonl", "utf8").trim().split(/\r?\n/).join(","));
+const SAMPLES = JSON.parse("[" + fs.readFileSync("docs-hackathon/challenge/frontier-reto-2/pruebas/ejemplos.jsonl", "utf8").trim().split(/\r?\n/).filter(Boolean).join(",") + "]");
 
 // Targeted sequences: each probes a dimension. Controls are known-valid v1 controls;
 // if v2 changed them we will see E202 and that itself is the signal.
