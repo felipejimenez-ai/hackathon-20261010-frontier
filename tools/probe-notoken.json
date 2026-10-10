@@ -1,0 +1,106 @@
+[
+  {
+    "method": "GET",
+    "path": "/health",
+    "token": "none",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/__reset",
+    "token": "none",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/msg",
+    "token": "none",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/msg",
+    "token": "bogus",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/msg",
+    "token": "bogus",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/__reset",
+    "token": "bogus",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/health",
+    "token": "bogus",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/nope",
+    "token": "none",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/nope",
+    "token": "none",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/msg",
+    "token": "none",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/",
+    "token": "none",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/msg",
+    "token": "none",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/msg",
+    "token": "none",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "text": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+  }
+]

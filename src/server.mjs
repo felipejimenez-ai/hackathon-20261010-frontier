@@ -131,38 +131,56 @@ function send(res, status, body) {
 
 export function createServer() {
   return http.createServer((req, res) => {
-    const url = req.url || "/";
+    const path = (req.url || "/").split("?")[0];
     const method = req.method || "GET";
 
-    if (method === "GET" && url === "/health") {
+    // Readiness probe: responds 200 without auth (entrypoint validation).
+    if (method === "GET" && path === "/health") {
       res.writeHead(200, { "Content-Type": "text/plain" });
       return res.end("ok");
+    }
+
+    const isReset = method === "POST" && path === "/__reset";
+    const isMsg = method === "POST" && path === "/msg";
+
+    // Routing resolves before auth. Observed: unknown route/method -> 404 E404 (no token needed).
+    if (!isReset && !isMsg) {
+      const e = CONFIG.errors.E404;
+      return send(res, e.status, { error: "E404", mensaje: e.mensaje });
+    }
+
+    // Auth. Observed: missing or bogus token -> 401 E001. If allowed tokens are configured
+    // (ENTRYPOINT_TOKEN env), reject anything else; otherwise accept any non-empty bearer.
+    const auth = req.headers["authorization"] || "";
+    const match = /^Bearer\s+(.+)$/i.exec(auth);
+    const token = match ? match[1].trim() : "";
+    if (!token) {
+      const e = CONFIG.errors.E001;
+      return send(res, e.status, { error: "E001", mensaje: e.mensaje });
+    }
+    if (CONFIG.auth.tokens.length && !CONFIG.auth.tokens.includes(token)) {
+      const e = CONFIG.errors.E001;
+      return send(res, e.status, { error: "E001", mensaje: e.mensaje });
+    }
+    const state = stateFor(token);
+
+    if (isReset) {
+      states.set(token, freshState());
+      return send(res, 200, { ok: true });
     }
 
     let raw = "";
     req.setEncoding("utf8");
     req.on("data", (c) => (raw += c));
     req.on("end", () => {
-      const token = (req.headers["authorization"] || "").replace(/^Bearer\s+/i, "");
-      const state = stateFor(token);
-
-      if (method === "POST" && url === "/__reset") {
-        states.set(token, freshState());
-        return send(res, 200, { ok: true });
+      let parsed;
+      try {
+        parsed = JSON.parse(raw || "{}");
+      } catch {
+        return send(res, 400, { error: "E302", mensaje: CONFIG.errors.E302.mensaje });
       }
-
-      if (method === "POST" && url === "/msg") {
-        let parsed;
-        try {
-          parsed = JSON.parse(raw || "{}");
-        } catch {
-          return send(res, 400, { error: "E302", mensaje: CONFIG.errors.E302.mensaje });
-        }
-        const out = handleMessage(state, parsed.m);
-        return send(res, out.status, out.body);
-      }
-
-      send(res, 404, {});
+      const out = handleMessage(state, parsed.m);
+      return send(res, out.status, out.body);
     });
   });
 }
