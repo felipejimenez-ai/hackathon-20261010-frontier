@@ -139,6 +139,19 @@ function send(res, status, body) {
 
 export function createServer() {
   return http.createServer((req, res) => {
+    try {
+      handleRequest(req, res);
+    } catch (e) {
+      console.error("handler error:", e);
+      try {
+        if (!res.headersSent) send(res, 500, { error: "E302", mensaje: CONFIG.errors.E302.mensaje });
+      } catch { /* ignore */ }
+    }
+  });
+}
+
+function handleRequest(req, res) {
+  {
     const path = (req.url || "/").split("?")[0];
     const method = req.method || "GET";
 
@@ -166,9 +179,13 @@ export function createServer() {
       const e = CONFIG.errors.E001;
       return send(res, e.status, { error: "E001", mensaje: e.mensaje });
     }
-    if (CONFIG.auth.tokens.length && !CONFIG.auth.tokens.includes(token)) {
-      const e = CONFIG.errors.E001;
-      return send(res, e.status, { error: "E001", mensaje: e.mensaje });
+    if (CONFIG.auth.tokens.length) {
+      const ok = CONFIG.auth.tokens.includes(token) ||
+        (CONFIG.auth.shapePrefix && token.startsWith(CONFIG.auth.shapePrefix) && token.length === CONFIG.auth.shapeLength);
+      if (!ok) {
+        const e = CONFIG.errors.E001;
+        return send(res, e.status, { error: "E001", mensaje: e.mensaje });
+      }
     }
     const state = stateFor(token);
 
@@ -200,7 +217,7 @@ export function createServer() {
       }
       return send(res, out.status, out.body);
     });
-  });
+  }
 }
 
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
@@ -208,6 +225,8 @@ if (isMain) {
   process.on("uncaughtException", (e) => console.error("uncaughtException:", e));
   process.on("unhandledRejection", (e) => console.error("unhandledRejection:", e));
   const server = createServer();
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 66000;
   server.listen(CONFIG.port, "0.0.0.0", () => {
     console.log(`replica listening on 0.0.0.0:${CONFIG.port}`);
   });

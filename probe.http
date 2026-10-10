@@ -1,8 +1,9 @@
 @original  = https://caja-negra-production-c64f.up.railway.app
+
 @replica   = https://hackathon-20261010-frontier-production.up.railway.app
 
 # tokens desde .env
-@origToken = {{$dotenv CAJA_NEGRA_TOKEN}}
+@origToken = {{$dotenv CAJA_NEGRA_TOKEN_2}}
 @teamToken = {{$dotenv ENTRYPOINT_TOKEN}}
 
 @ct = application/json
