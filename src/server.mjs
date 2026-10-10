@@ -1,0 +1,158 @@
+import http from "node:http";
+import { fileURLToPath } from "node:url";
+import { CONFIG } from "./config.mjs";
+
+const pad = (n) => String(n).padStart(CONFIG.idPad, "0");
+
+function freshState() {
+  return {
+    accounts: new Map(),
+    operations: new Map(),
+    accountSeq: 0,
+    operationSeq: 0,
+  };
+}
+
+const states = new Map();
+function stateFor(token) {
+  let s = states.get(token);
+  if (!s) {
+    s = freshState();
+    states.set(token, s);
+  }
+  return s;
+}
+
+function errorBody(code) {
+  const e = CONFIG.errors[code];
+  return { status: e.status, body: { error: code, mensaje: e.mensaje } };
+}
+
+function takeOperation(state, type) {
+  state.operationSeq += 1;
+  const id = `${CONFIG.operationPrefix}${pad(state.operationSeq)}`;
+  const op = { id, type, annulled: false };
+  state.operations.set(id, op);
+  return op;
+}
+
+const handlers = {
+  ALTA(state, args) {
+    const [name] = args;
+    state.accountSeq += 1;
+    const id = `${CONFIG.accountPrefix}${pad(state.accountSeq)}`;
+    state.accounts.set(id, { id, name, saldo: 0 });
+    return { status: 201, body: { cuentaId: id } };
+  },
+
+  CONSULTA(state, args) {
+    const [id] = args;
+    const acc = state.accounts.get(id);
+    if (!acc) return errorBody("E401");
+    return { status: 200, body: { cuenta_id: id, saldo: acc.saldo } };
+  },
+
+  DEPOSITO(state, args) {
+    const [id, amountRaw] = args;
+    const acc = state.accounts.get(id);
+    if (!acc) return errorBody("E401");
+    const amount = Number(amountRaw);
+    acc.saldo += amount;
+    const op = takeOperation(state, "DEPOSITO");
+    return { status: 200, body: { status: CONFIG.depositStatus, operacionId: op.id } };
+  },
+
+  TRANSFER(state, args) {
+    const [fromId, toId, amountRaw] = args;
+    const from = state.accounts.get(fromId);
+    const to = state.accounts.get(toId);
+    if (!from || !to) return errorBody("E401");
+    const amount = Number(amountRaw);
+    if (amount > CONFIG.transferLimit) return errorBody("E506");
+    if (from.saldo < amount) return errorBody("E507");
+    from.saldo -= amount;
+    to.saldo += amount;
+    const op = takeOperation(state, "TRANSFER");
+    return { status: 200, body: { status: CONFIG.depositStatus, operacionId: op.id } };
+  },
+
+  ANULA(state, args) {
+    const [opId] = args;
+    const op = state.operations.get(opId);
+    if (!op) return errorBody("E402");
+    if (op.annulled) return { status: 200, body: { ok: false, motivo: "ya anulada" } };
+    op.annulled = true;
+    return { status: 200, body: { ok: true, anulada: opId } };
+  },
+};
+
+export function handleMessage(state, m) {
+  if (typeof m !== "string") return errorBody("E302");
+  const segments = m.split(";");
+  const cmd = segments[0].toUpperCase();
+
+  if (cmd === "PING") return { status: 200, body: { pong: true } };
+
+  if (segments.some((s) => s === "")) return errorBody("E104");
+
+  const control = segments[segments.length - 1];
+  if (!/^-?\d+$/.test(control)) return errorBody("E201");
+
+  const args = segments.slice(1, -1);
+
+  if (!Object.prototype.hasOwnProperty.call(CONFIG.commands, cmd)) return errorBody("E301");
+  if (args.length !== CONFIG.commands[cmd]) return errorBody("E302");
+
+  return handlers[cmd](state, args);
+}
+
+function send(res, status, body) {
+  const payload = JSON.stringify(body);
+  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(payload);
+}
+
+export function createServer() {
+  return http.createServer((req, res) => {
+    const url = req.url || "/";
+    const method = req.method || "GET";
+
+    if (method === "GET" && url === "/health") {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      return res.end("ok");
+    }
+
+    let raw = "";
+    req.on("data", (c) => (raw += c));
+    req.on("end", () => {
+      const token = (req.headers["authorization"] || "").replace(/^Bearer\s+/i, "");
+      const state = stateFor(token);
+
+      if (method === "POST" && url === "/__reset") {
+        states.set(token, freshState());
+        return send(res, 200, { ok: true });
+      }
+
+      if (method === "POST" && url === "/msg") {
+        let parsed;
+        try {
+          parsed = JSON.parse(raw || "{}");
+        } catch {
+          return send(res, 400, { error: "E302", mensaje: CONFIG.errors.E302.mensaje });
+        }
+        const out = handleMessage(state, parsed.m);
+        return send(res, out.status, out.body);
+      }
+
+      send(res, 404, {});
+    });
+  });
+}
+
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isMain) {
+  const server = createServer();
+  server.listen(CONFIG.port, "0.0.0.0", () => {
+    console.log(`replica listening on 0.0.0.0:${CONFIG.port}`);
+  });
+}

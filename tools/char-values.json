@@ -1,0 +1,82 @@
+{
+  "0": {
+    "control": 39,
+    "v": 1,
+    "predicted": 39
+  },
+  "I": {
+    "control": 12,
+    "v": 92,
+    "predicted": 12
+  },
+  "J": {
+    "control": 60,
+    "v": 8,
+    "predicted": 60
+  },
+  "K": {
+    "control": 57,
+    "v": 7,
+    "predicted": 57
+  },
+  "L": {
+    "control": 54,
+    "v": 6,
+    "predicted": 54
+  },
+  "u": {
+    "control": 27,
+    "v": 97,
+    "predicted": 33
+  },
+  "c": {
+    "control": 30,
+    "v": 98,
+    "predicted": 36
+  },
+  "i": {
+    "control": 18,
+    "v": 94,
+    "predicted": 18
+  },
+  "a": {
+    "control": 42,
+    "v": 2,
+    "predicted": 42
+  },
+  "e": {
+    "control": 30,
+    "v": 98,
+    "predicted": 30
+  },
+  "o": {
+    "control": 51,
+    "v": 5,
+    "predicted": 51
+  },
+  "m": {
+    "control": 57,
+    "v": 7,
+    "predicted": 57
+  },
+  "t": {
+    "control": 36,
+    "v": 0,
+    "predicted": 36
+  },
+  "l": {
+    "control": 60,
+    "v": 8,
+    "predicted": 60
+  },
+  "z": {
+    "control": 18,
+    "v": 94,
+    "predicted": 18
+  },
+  "-": {
+    "control": 36,
+    "v": 0,
+    "predicted": 36
+  }
+}

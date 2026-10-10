@@ -1,0 +1,1612 @@
+[
+  {
+    "prefix": "PING",
+    "passing": [
+      {
+        "control": "0",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "1",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "2",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "3",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "4",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "5",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "6",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "7",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "8",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "9",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "10",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "11",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "12",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "13",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "14",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "15",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "16",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "17",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "18",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "19",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "20",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "21",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "22",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "23",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "24",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "25",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "26",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "27",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "28",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "29",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "30",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "31",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "32",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "33",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "34",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "35",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "36",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "37",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "38",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "39",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "40",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "41",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "42",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "43",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "44",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "45",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "46",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "47",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "48",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "49",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "50",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "51",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "52",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "53",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "54",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "55",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "56",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "57",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "58",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "59",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "60",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "61",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "62",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "63",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "64",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "65",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "66",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "67",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "68",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "69",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "70",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "71",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "72",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "73",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "74",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "75",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "76",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "77",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "78",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "79",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "80",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "81",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "82",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "83",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "84",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "85",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "86",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "87",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "88",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "89",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "90",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "91",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "92",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "93",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "94",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "95",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "96",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "97",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "98",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      },
+      {
+        "control": "99",
+        "status": 200,
+        "body": {
+          "pong": true
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ALTA;Lucia",
+    "passing": [
+      {
+        "control": "82",
+        "status": 201,
+        "body": {
+          "cuentaId": "AC-0001"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ALTA;Mateo",
+    "passing": [
+      {
+        "control": "3",
+        "status": 201,
+        "body": {
+          "cuentaId": "AC-0001"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ALTA;Gomez",
+    "passing": [
+      {
+        "control": "60",
+        "status": 201,
+        "body": {
+          "cuentaId": "AC-0001"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AC-0001",
+    "passing": [
+      {
+        "control": "14",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AC-0002",
+    "passing": [
+      {
+        "control": "11",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AC-0009",
+    "passing": [
+      {
+        "control": "87",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "DEPOSITO;AC-0001;250000",
+    "passing": [
+      {
+        "control": "86",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "DEPOSITO;AC-0002;700",
+    "passing": [
+      {
+        "control": "35",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "DEPOSITO;AC-0001;700",
+    "passing": [
+      {
+        "control": "28",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "TRANSFER;AC-0001;AC-0002;40000",
+    "passing": [
+      {
+        "control": "86",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "TRANSFER;AC-0001;AC-0002;120000",
+    "passing": [
+      {
+        "control": "55",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "TRANSFER;AC-0001;AC-0002;100000",
+    "passing": [
+      {
+        "control": "12",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "TRANSFER;AC-0002;AC-0001;50000",
+    "passing": [
+      {
+        "control": "23",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ANULA;OP-0003",
+    "passing": [
+      {
+        "control": "66",
+        "status": 404,
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ANULA;OP-0001",
+    "passing": [
+      {
+        "control": "72",
+        "status": 404,
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;XY",
+    "passing": [
+      {
+        "control": "91",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;A",
+    "passing": [
+      {
+        "control": "98",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;B",
+    "passing": [
+      {
+        "control": "95",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;C",
+    "passing": [
+      {
+        "control": "92",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;ZZ",
+    "passing": [
+      {
+        "control": "70",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;0",
+    "passing": [
+      {
+        "control": "4",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;1",
+    "passing": [
+      {
+        "control": "98",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;9",
+    "passing": [
+      {
+        "control": "74",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AA",
+    "passing": [
+      {
+        "control": "95",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AB",
+    "passing": [
+      {
+        "control": "92",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AC",
+    "passing": [
+      {
+        "control": "89",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AC-0000",
+    "passing": [
+      {
+        "control": "17",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AC-0003",
+    "passing": [
+      {
+        "control": "8",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ALTA;AC-0001",
+    "passing": [
+      {
+        "control": "72",
+        "status": 201,
+        "body": {
+          "cuentaId": "AC-0001"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;2",
+    "passing": [
+      {
+        "control": "95",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;3",
+    "passing": [
+      {
+        "control": "92",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;4",
+    "passing": [
+      {
+        "control": "89",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;5",
+    "passing": [
+      {
+        "control": "86",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;8",
+    "passing": [
+      {
+        "control": "77",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;D",
+    "passing": [
+      {
+        "control": "89",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;E",
+    "passing": [
+      {
+        "control": "86",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;a",
+    "passing": [
+      {
+        "control": "98",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;z",
+    "passing": [
+      {
+        "control": "50",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;",
+    "passing": [
+      {
+        "control": "0",
+        "status": 400,
+        "body": {
+          "error": "E104",
+          "mensaje": "segmento vacío"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "ALTA;Z",
+    "passing": [
+      {
+        "control": "78",
+        "status": 201,
+        "body": {
+          "cuentaId": "AC-0001"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAA",
+    "passing": [
+      {
+        "control": "36",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAB",
+    "passing": [
+      {
+        "control": "33",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAABA",
+    "passing": [
+      {
+        "control": "6",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAABAA",
+    "passing": [
+      {
+        "control": "27",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AABAAA",
+    "passing": [
+      {
+        "control": "43",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;ABAAAA",
+    "passing": [
+      {
+        "control": "9",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;BAAAAA",
+    "passing": [
+      {
+        "control": "57",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAC",
+    "passing": [
+      {
+        "control": "30",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAAAAAA",
+    "passing": [
+      {
+        "control": "87",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAABAAAAAA",
+    "passing": [
+      {
+        "control": "6",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AABAAAAAAA",
+    "passing": [
+      {
+        "control": "53",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;ABAAAAAAAA",
+    "passing": [
+      {
+        "control": "38",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;BAAAAAAAAA",
+    "passing": [
+      {
+        "control": "82",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAA1",
+    "passing": [
+      {
+        "control": "36",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAA2",
+    "passing": [
+      {
+        "control": "33",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAQ",
+    "passing": [
+      {
+        "control": "39",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAABB",
+    "passing": [
+      {
+        "control": "3",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAA0",
+    "passing": [
+      {
+        "control": "39",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAF",
+    "passing": [
+      {
+        "control": "21",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAP",
+    "passing": [
+      {
+        "control": "42",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAA_",
+    "passing": [
+      {
+        "control": "63",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAG",
+    "passing": [
+      {
+        "control": "18",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAZ",
+    "passing": [
+      {
+        "control": "12",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAR",
+    "passing": [
+      {
+        "control": "36",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAO",
+    "passing": [
+      {
+        "control": "45",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAH",
+    "passing": [
+      {
+        "control": "15",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAM",
+    "passing": [
+      {
+        "control": "51",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;AAAAAN",
+    "passing": [
+      {
+        "control": "48",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;CCA",
+    "passing": [
+      {
+        "control": "84",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  },
+  {
+    "prefix": "CONSULTA;DCA",
+    "passing": [
+      {
+        "control": "75",
+        "status": 404,
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        }
+      }
+    ]
+  }
+]

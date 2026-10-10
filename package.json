@@ -1,0 +1,15 @@
+{
+  "name": "blackbox-replica",
+  "version": "1.0.0",
+  "description": "Byte-identical replica of the undocumented 'caja negra' HTTP service (Frontier Reto 2)",
+  "type": "module",
+  "main": "src/server.mjs",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node tools/local-test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true
+}

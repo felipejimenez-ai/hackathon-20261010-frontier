@@ -1,0 +1,50 @@
+---
+title: Black Box Replica - Architecture
+---
+flowchart TD
+    Client(["Client<br/>Authorization: Bearer &lt;token&gt;"])
+
+    subgraph Replica["Replica service (single process, in-memory per-token state)"]
+        Entry{"HTTP Entry<br/>any route / any method"}
+        Health["GET /health -> 200 ready"]
+        Reset["POST /__reset -> clear token state"]
+        Router["Token Router"]
+
+        Parser["Parser<br/>m = split on ';'"]
+        Integrity["Integrity check<br/>control = f(msg)"]
+        Dispatcher["Dispatcher<br/>resolve command + arity"]
+        Handlers["Command handlers<br/>PING | ALTA | CONSULTA | DEPOSITO | TRANSFER | ANULA"]
+        Store[("Token Store<br/>balances, AC-/OP- ids, annulled set, counters")]
+        Serializer["Serializer<br/>exact status + body, typos preserved"]
+        Err["Error mapper<br/>E2xx | E3xx | E4xx | E5xx precedence"]
+        Config[/"Config (data, re-derivable)<br/>limits, checksum params, id prefixes, typo table"/]
+
+        Entry -->|"/health"| Health
+        Entry -->|"/__reset"| Reset
+        Entry -->|"any other route"| Router
+
+        Router -->|"valid team token"| Parser
+        Router -->|"bad or missing token"| Mimic["Mimic original response"]
+
+        Parser --> Integrity
+        Integrity -->|"E201 malformed / E202 invalid"| Err
+        Integrity -->|"ok"| Dispatcher
+
+        Dispatcher -->|"E301 unknown / E302 arity"| Err
+        Dispatcher -->|"ok"| Handlers
+
+        Handlers --> Store
+        Store --> Serializer
+        Serializer --> Resp["status + body"]
+        Err --> Resp
+        Mimic --> Resp
+
+        Config -.-> Integrity
+        Config -.-> Handlers
+        Config -.-> Serializer
+    end
+
+    Resp --> Client
+
+    Original(["Original service<br/>caja-negra-production..."]) -.->|"recon only - NEVER called at runtime"| Recon["Recon / differential fuzz harness"]
+    Recon -.->|"derives"| Config
