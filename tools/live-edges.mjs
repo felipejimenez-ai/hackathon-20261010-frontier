@@ -1,0 +1,14 @@
+import fs from "node:fs";
+const env = Object.fromEntries(fs.readFileSync(".env","utf8").split(/\r?\n/).map(l=>l.match(/^\s*([^#=\s]+)\s*=\s*(.*)$/)).filter(Boolean).map(m=>[m[1],m[2].replace(/^"|"$/g,"")]));
+const u = "https://hackathon-20261010-frontier-production.up.railway.app";
+const T = { Authorization: "Bearer " + env.ENTRYPOINT_TOKEN, "Content-Type": "application/json" };
+const post = async (h, b) => { const r = await fetch(u + "/msg", { method: "POST", headers: h, body: b }); return { s: r.status, t: await r.text() }; };
+let ok = 0, n = 0;
+const chk = (l, g, s, body) => { n++; const good = g.s === s && g.t === body; if (good) ok++; else console.log("FAIL", l, g.s, g.t); };
+console.log("bogus:", (await post({ Authorization: "Bearer bogus" }, JSON.stringify({ m: "PING;0" }))));
+chk("bogus", await post({ Authorization: "Bearer bogus" }, JSON.stringify({ m: "PING;0" })), 401, '{"error":"E001","mensaje":"no autorizado"}');
+chk("empty", await post(T, ""), 400, '{"error":"E100","mensaje":"json inválido"}');
+chk("null", await post(T, "null"), 400, '{"error":"E102","mensaje":"falta m"}');
+chk("no m", await post(T, "{}"), 400, '{"error":"E102","mensaje":"falta m"}');
+const r = await fetch(u + "/nope"); chk("nope", { s: r.status, t: await r.text() }, 404, '{"error":"E404","mensaje":"ruta desconocida"}');
+console.log(`live edges: ${ok}/${n}`);
