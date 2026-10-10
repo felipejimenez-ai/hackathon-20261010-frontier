@@ -6,8 +6,12 @@ import { expectedControl } from "./checksum.mjs";
 const pad = (n) => String(n).padStart(CONFIG.idPad, "0");
 
 function parseAmount(raw) {
-  return /^\d+$/.test(raw) ? Number(raw) : null;
+  if (!/^[1-9]\d*$/.test(raw)) return null;
+  const n = Number(raw);
+  return n <= CONFIG.maxAmount ? n : null;
 }
+
+const saldoString = (cents) => (cents / CONFIG.currencyDivisor).toFixed(2);
 
 function freshState() {
   return {
@@ -54,15 +58,15 @@ const handlers = {
     const [id] = args;
     const acc = state.accounts.get(id);
     if (!acc) return errorBody("E401");
-    return { status: 200, body: { cuenta_id: id, saldo: acc.saldo } };
+    return { status: 200, body: { cuenta_id: id, saldo: saldoString(acc.saldo) } };
   },
 
   DEPOSITO(state, args) {
     const [id, amountRaw] = args;
+    const amount = parseAmount(amountRaw);
+    if (amount === null) return errorBody("E303");
     const acc = state.accounts.get(id);
     if (!acc) return errorBody("E401");
-    const amount = parseAmount(amountRaw);
-    if (amount === null) return errorBody("E201");
     acc.saldo += amount;
     const op = takeOperation(state, "DEPOSITO");
     op.undo = () => { acc.saldo -= amount; };
@@ -71,11 +75,11 @@ const handlers = {
 
   TRANSFER(state, args) {
     const [fromId, toId, amountRaw] = args;
+    const amount = parseAmount(amountRaw);
+    if (amount === null) return errorBody("E303");
     const from = state.accounts.get(fromId);
     const to = state.accounts.get(toId);
     if (!from || !to) return errorBody("E401");
-    const amount = parseAmount(amountRaw);
-    if (amount === null) return errorBody("E201");
     if (amount > CONFIG.transferLimit) return errorBody("E506");
     if (from.saldo < amount) return errorBody("E507");
     from.saldo -= amount;
@@ -100,25 +104,26 @@ const handlers = {
 export function handleMessage(state, m) {
   if (typeof m !== "string") return errorBody("E302");
   const segments = m.split(";");
-  const cmd = segments[0].toUpperCase();
-
-  if (cmd === "PING") return { status: 200, body: { pong: true } };
-
+  if (segments.length < 2) return errorBody("E103");
   if (segments.some((s) => s === "")) return errorBody("E104");
 
+  const cmd = segments[0].toUpperCase();
   const control = segments[segments.length - 1];
-  if (!/^\d+$/.test(control)) return errorBody("E201");
-  if (control.length > 1 && control[0] === "0") return errorBody("E202");
-
   const args = segments.slice(1, -1);
+
+  // PING ignores the control (but still requires it to be present, and arity 0).
+  if (cmd !== "PING") {
+    if (!/^\d+$/.test(control)) return errorBody("E201");
+    if (control.length > 1 && control[0] === "0") return errorBody("E202");
+    if (CONFIG.control.mode !== "lenient") {
+      const expected = expectedControl(segments.slice(0, -1).join(";"));
+      if (expected !== null && Number(control) !== expected) return errorBody("E202");
+    }
+  }
 
   if (!Object.prototype.hasOwnProperty.call(CONFIG.commands, cmd)) return errorBody("E301");
   if (args.length !== CONFIG.commands[cmd]) return errorBody("E302");
-
-  if (CONFIG.control.mode === "hybrid") {
-    const expected = expectedControl(segments.slice(0, -1).join(";"));
-    if (expected !== null && Number(control) !== expected) return errorBody("E202");
-  }
+  if (cmd === "PING") return { status: 200, body: { pong: true } };
 
   return handlers[cmd](state, args);
 }
