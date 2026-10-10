@@ -1,0 +1,24 @@
+import fs from "node:fs";
+const env=Object.fromEntries(fs.readFileSync(".env","utf8").split(/\r?\n/).map(l=>l.match(/^\s*([^#=\s]+)\s*=\s*(.*)$/)).filter(Boolean).map(m=>[m[1],m[2].replace(/^"|"$/g,"")]));
+const u="https://hackathon-20261010-frontier-production.up.railway.app";
+const T={Authorization:"Bearer "+env.ENTRYPOINT_TOKEN,"Content-Type":"application/json"};
+const B={Authorization:"Bearer bogus","Content-Type":"application/json"};
+const call=async(path,init)=>{try{const r=await fetch(u+path,init);return[s,t]=[r.status,await r.text()]}catch(e){return["ERR",String(e)]}};
+let pass=0,total=0;const chk=(l,g,e)=>{total++;const ok=g.s===e.s&&JSON.parse(g.t)&&JSON.stringify(JSON.parse(g.t))===JSON.stringify(e.b);if(ok)pass++;else console.log("FAIL",l,g.s,g.t)};
+const post=(h,b)=>fetch(u+"/msg",{method:"POST",headers:h,body:b}).then(async r=>[r.status,await r.text()]).then(([s,t])=>({s,t})).catch(e=>({s:"ERR",t:String(e)}));
+console.log("--- HTTP edges ---");
+let g;
+g=await post(T,""); chk("bad json",g,{s:400,b:{error:"E100",mensaje:"json inválido"}});
+g=await post(T,"null"); chk("null",g,{s:400,b:{error:"E102",mensaje:"falta m"}});
+g=await post(T,"{}"); chk("{}",g,{s:400,b:{error:"E102",mensaje:"falta m"}});
+g=await post(T,'{"m":5}'); chk("m=5",g,{s:400,b:{error:"E102",mensaje:"falta m"}});
+g=await fetch(u+"/nope").then(async r=>({s:r.status,t:await r.text()})); chk("GET /nope",g,{s:404,b:{error:"E404",mensaje:"ruta desconocida"}});
+g=await fetch(u+"/health",{method:"POST"}).then(async r=>({s:r.status,t:await r.text()})); chk("POST /health",g,{s:404,b:{error:"E404",mensaje:"ruta desconocida"}});
+g=await post(B,'{"m":"PING;0"}'); chk("bogus token",g,{s:401,b:{error:"E001",mensaje:"no autorizado"}});
+g=await post({ },'{"m":"PING;0"}'); chk("no token",g,{s:401,b:{error:"E001",mensaje:"no autorizado"}});
+console.log(`edges: ${pass}/${total}`);
+console.log("--- 20 sample v2 replay ---");
+const SEQ=[["PING;64",200,{pong:true}],["ALTA;Lucia;83",400,{error:"E202",mensaje:"control inválido"}],["ALTA;Lucia;82",201,{cuentaId:"AC-0001"}],["ALTA;Mateo;3",201,{cuentaId:"AC-0002"}],["CONSULTA;AC-0001;14",200,{cuenta_id:"AC-0001",saldo:"0.00"}],["DEPOSITO;AC-0001;250000;86",200,{status:"recieved",operacionId:"OP-0001"}],["TRANSFER;AC-0001;AC-0002;40000;86",200,{status:"recieved",operacionId:"OP-0002"}],["CONSULTA;AC-0002;11",200,{cuenta_id:"AC-0002",saldo:"400.00"}],["TRANSFER;AC-0001;AC-0002;120000;55",422,{error:"E506",mensaje:"límite excedido"}],["TRANSFER;AC-0001;AC-0002;100000;12",422,{error:"E506",mensaje:"límite excedido"}],["CONSULtA;AC-0001;14",200,{cuenta_id:"AC-0001",saldo:"2100.00"}],["SALDOS;AC-0001;38",400,{error:"E301",mensaje:"comando desconocido "}],["ANULA;OP-0003;66",404,{error:"E402",mensaje:"operación inexistente"}],["ANULA;OP-0003;66",404,{error:"E402",mensaje:"operación inexistente"}],["CONSULTA;AC-0009;87",404,{error:"E401",mensaje:"cuenta inexistente"}],["TRANSFER;AC-0002;AC-0001;50000;23",422,{error:"E507",mensaje:"saldo insuficiente"}],["DEPOSITO;AC-0002;700;5X",400,{error:"E201",mensaje:"control mal formado"}],["DEPOSITO;AC-0002;700;35",200,{status:"recieved",operacionId:"OP-0003"}],["CONSULTA;AC-0002;11",200,{cuenta_id:"AC-0002",saldo:"407.00"}],["ALTA;Lucia;Gomez;11",400,{error:"E302",mensaje:"aridad inválida"}]];
+await fetch(u+"/__reset",{method:"POST",headers:T});let p2=0;
+for(const [m,es,eb] of SEQ){const g=await post(T,JSON.stringify({m}));const ok=g.s===es&&JSON.stringify(JSON.parse(g.t))===JSON.stringify(eb);if(ok)p2++;else console.log("SEQFAIL",m,g.s,g.t)}
+console.log(`sample replay: ${p2}/${SEQ.length}`);

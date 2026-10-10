@@ -183,7 +183,7 @@ export function createServer() {
     req.on("end", () => {
       let parsed;
       try {
-        parsed = JSON.parse(raw || "{}");
+        parsed = JSON.parse(raw);
       } catch {
         const e = CONFIG.errors.E100;
         return send(res, e.status, { error: "E100", mensaje: e.mensaje });
