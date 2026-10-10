@@ -63,7 +63,7 @@ Crea cuenta con id incremental por token `AC-####`.
 ### `CONSULTA;cuentaId`
 | ID | Comportamiento | Evidencia | Confianza |
 |----|----------------|-----------|-----------|
-| CM-3 | `200 {"cuenta_id":"AC-0001","saldo":N}` con el saldo actual. | 5, 8, 11, 19 | confirmado |
+| CM-3 | `200 {"cuenta_id":"AC-0001","saldo":"N.DD"}`. **v2:** el saldo es un **string** en unidades (`centavos/100`, 2 decimales), p. ej. `"2100.00"`. | 5, 8, 11, 19; incidente:muestras | confirmado |
 | CM-4 | Cuenta inexistente → `404 E401`. | 15, 1149 | confirmado |
 
 ### `DEPOSITO;cuentaId;monto`
@@ -76,7 +76,8 @@ Crea cuenta con id incremental por token `AC-####`.
 | ID | Comportamiento | Evidencia | Confianza |
 |----|----------------|-----------|-----------|
 | CM-7 | Mueve fondos y responde `200 {"status":"recieved","operacionId":"OP-####"}`. | 7, 10 | confirmado |
-| CM-8 | `monto > límite` → `422 E506` (límite 100000: 100000 ok, 120000 error). | 9, 10 | probable |
+| CM-8 | `monto > límite` → `422 E506`. **v2:** límite = **50000** (50000 ok, 50001 → E506), independiente del saldo. | 9, 10; incidente:limite | confirmado |
+| CM-16 | **v2:** el monto se valida antes que la cuenta: entero positivo sin ceros a la izquierda, ≤ 9999999999; si no → `400 E303` (p. ej. `0`, `000700`, `12.5`, `-5`, `abc`). | incidente:explorar, probe-v2 | confirmado |
 | CM-9 | Saldo insuficiente → `422 E507`. | 16 | confirmado |
 | CM-10 | Precedencia: `E506` (límite) se evalúa **antes** que `E507` (saldo). | 9 | confirmado |
 | CM-11 | Cuenta (origen o destino) inexistente → `404 E401`. | 1149 | probable |
@@ -118,6 +119,9 @@ observado: formato de control (`E201`) → comando desconocido (`E301`) → arid
 | ER-8 | 422 | `{"error":"E506","mensaje":"límite excedido"}` | 9 | confirmado |
 | ER-9 | 422 | `{"error":"E507","mensaje":"saldo insuficiente"}` | 16 | confirmado |
 | ER-10 | — | Precedencia: `E506` antes que `E507`; `E301`/`E302` con control válido. | 9, 12, 20 | confirmado |
+| ER-13 | 400 | `{"error":"E103","mensaje":"falta control"}` (mensaje sin `;`, sin campo control). | probe-v2 | confirmado |
+| ER-14 | 400 | `{"error":"E303","mensaje":"monto inválido"}` (monto no válido; antes de E401). | incidente:explorar, probe-v2 | confirmado |
+| ER-15 | — | **v2:** el control (E201/E202) se evalúa **antes** de comando (E301) y aridad (E302); `PING` ignora el control pero exige su presencia (E103/E104) y aridad 0. | incidente:explorar | confirmado |
 | ER-11 | 401 | `{"error":"E001","mensaje":"no autorizado"}` (token ausente/erróneo). | sin-token | confirmado |
 | ER-12 | 404 | `{"error":"E404","mensaje":"ruta desconocida"}` (ruta/método inexistente; antes de auth). | sin-token | confirmado |
 
@@ -129,7 +133,10 @@ observado: formato de control (`E201`) → comando desconocido (`E301`) → arid
 | CA-2 | Los parámetros vulnerables (límite de transferencia, prefijos, checksum) se aíslan en `src/config.mjs` para actualizarlos como datos, no como código. | diseño (`docs/design/system-design.md`) | supuesto |
 | CA-3 | No se detectó ningún cambio de parámetro durante la recon (todas las mediciones fueron estables). | 1–7896 | probable |
 | CA-4 | Incidente v2 (~15:30): el proveedor desplegó la versión 2 con 3 comportamientos cambiados. Auth y rutas se midieron contra el servicio en vivo (v2): `401 E001` y `404 E404`. | sin-token (9000–9012), ticket FR-0153 | confirmado |
-| CA-5 | Estrategia de detección: un canario compara el servicio en vivo contra la réplica v1 (validada 20/20) con controles válidos conocidos; cualquier diferencia es candidata a cambio. Pendiente de token para ejecutarlo. | — | supuesto |
+| CA-5 | Estrategia de detección: un canario compara el servicio en vivo contra la réplica (oráculo v1, validada 20/20) con controles válidos conocidos; cualquier diferencia es un cambio. Ejecutado con `tools/incident.mjs`. | incidente:muestras | confirmado |
+| CA-6 | **Cambio v2 #1:** el saldo se expone como string decimal en unidades (`"2100.00"`), no entero. | incidente:muestras (n=5,8,11,19) | confirmado |
+| CA-7 | **Cambio v2 #2:** el límite de transferencia pasó de 100000 a 50000 (independiente del saldo). | incidente:limite | confirmado |
+| CA-8 | **Cambio v2 #3:** validación de monto con nuevo `E303` (monto inválido) evaluado antes de la cuenta; además `E103` (falta control) y control antes de comando/aridad. | incidente:explorar, probe-v2 | confirmado |
 
 ## 7. Riesgos
 

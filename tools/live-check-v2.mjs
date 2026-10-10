@@ -1,0 +1,36 @@
+import fs from "node:fs";
+const env = Object.fromEntries(fs.readFileSync(".env","utf8").split(/\r?\n/).map(l=>l.match(/^\s*([^#=\s]+)\s*=\s*(.*)$/)).filter(Boolean).map(m=>[m[1],m[2].replace(/^"|"$/g,"")]));
+const u = "https://hackathon-20261010-frontier-production.up.railway.app";
+const h = { Authorization: "Bearer " + env.ENTRYPOINT_TOKEN, "Content-Type": "application/json" };
+const SEQ = [
+  ["PING;64", 200, { pong: true }],
+  ["ALTA;Lucia;83", 400, { error: "E202", mensaje: "control inválido" }],
+  ["ALTA;Lucia;82", 201, { cuentaId: "AC-0001" }],
+  ["ALTA;Mateo;3", 201, { cuentaId: "AC-0002" }],
+  ["CONSULTA;AC-0001;14", 200, { cuenta_id: "AC-0001", saldo: "0.00" }],
+  ["DEPOSITO;AC-0001;250000;86", 200, { status: "recieved", operacionId: "OP-0001" }],
+  ["TRANSFER;AC-0001;AC-0002;40000;86", 200, { status: "recieved", operacionId: "OP-0002" }],
+  ["CONSULTA;AC-0002;11", 200, { cuenta_id: "AC-0002", saldo: "400.00" }],
+  ["TRANSFER;AC-0001;AC-0002;120000;55", 422, { error: "E506", mensaje: "límite excedido" }],
+  ["TRANSFER;AC-0001;AC-0002;100000;12", 422, { error: "E506", mensaje: "límite excedido" }],
+  ["CONSULtA;AC-0001;14", 200, { cuenta_id: "AC-0001", saldo: "2100.00" }],
+  ["SALDOS;AC-0001;38", 400, { error: "E301", mensaje: "comando desconocido " }],
+  ["ANULA;OP-0003;66", 404, { error: "E402", mensaje: "operación inexistente" }],
+  ["ANULA;OP-0003;66", 404, { error: "E402", mensaje: "operación inexistente" }],
+  ["CONSULTA;AC-0009;87", 404, { error: "E401", mensaje: "cuenta inexistente" }],
+  ["TRANSFER;AC-0002;AC-0001;50000;23", 422, { error: "E507", mensaje: "saldo insuficiente" }],
+  ["DEPOSITO;AC-0002;700;5X", 400, { error: "E201", mensaje: "control mal formado" }],
+  ["DEPOSITO;AC-0002;700;35", 200, { status: "recieved", operacionId: "OP-0003" }],
+  ["CONSULTA;AC-0002;11", 200, { cuenta_id: "AC-0002", saldo: "407.00" }],
+  ["ALTA;Lucia;Gomez;11", 400, { error: "E302", mensaje: "aridad inválida" }],
+];
+const msg = async (m) => { const r = await fetch(u + "/msg", { method: "POST", headers: h, body: JSON.stringify({ m }) }); return { s: r.status, t: await r.text() }; };
+await fetch(u + "/__reset", { method: "POST", headers: h });
+let pass = 0;
+for (const [i, [m, es, eb]] of SEQ.entries()) {
+  const g = await msg(m);
+  let body; try { body = JSON.parse(g.t); } catch { body = g.t; }
+  const ok = g.s === es && JSON.stringify(body) === JSON.stringify(eb);
+  if (ok) pass++; else console.log(`FAIL n=${i + 1} ${m} -> ${g.s} ${g.t}`);
+}
+console.log(`live v2 replay: ${pass}/${SEQ.length}`);
