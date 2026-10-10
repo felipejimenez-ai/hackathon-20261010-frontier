@@ -36,6 +36,8 @@ export const CONFIG = {
   // error contract: code -> { status, mensaje }
   errors: {
     E001: { status: 401, mensaje: "no autorizado" },
+    E100: { status: 400, mensaje: "json inválido" },
+    E102: { status: 400, mensaje: "falta m" },
     E103: { status: 400, mensaje: "falta control" },
     E104: { status: 400, mensaje: "segmento vacío" },
     E201: { status: 400, mensaje: "control mal formado" },
@@ -43,6 +45,7 @@ export const CONFIG = {
     E301: { status: 400, mensaje: "comando desconocido " },
     E302: { status: 400, mensaje: "aridad inválida" },
     E303: { status: 400, mensaje: "monto inválido" },
+    E304: { status: 400, mensaje: "origen y destino iguales" },
     E401: { status: 404, mensaje: "cuenta inexistente" },
     E402: { status: 404, mensaje: "operación inexistente" },
     E506: { status: 422, mensaje: "límite excedido" },

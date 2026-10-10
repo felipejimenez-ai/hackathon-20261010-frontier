@@ -34,3 +34,29 @@ for (const [i, [m, es, eb]] of SEQ.entries()) {
     (ok ? "" : `  exp ${es} ${JSON.stringify(eb)}`));
 }
 console.log(`\nv2 replay: ${pass}/${SEQ.length}`);
+
+// Extra stateless / stateful checks for v2 error paths.
+const state2 = { accounts: new Map(), operations: new Map(), accountSeq: 0, operationSeq: 0 };
+const EXTRA = [
+  ["PING", 400, { error: "E103", mensaje: "falta control" }],
+  ["ALTA;Lucia;100", 400, { error: "E201", mensaje: "control mal formado" }],
+  ["CONSULTA;;0", 400, { error: "E104", mensaje: "segmento vacío" }],
+  ["CONSULTA;AC-0001", 400, { error: "E201", mensaje: "control mal formado" }],
+];
+let pass2 = 0;
+for (const [m, es, eb] of EXTRA) {
+  const g = handleMessage(state2, m);
+  const ok = g.status === es && JSON.stringify(g.body) === JSON.stringify(eb);
+  if (ok) pass2++;
+  else console.log(`EXTRA FAIL ${m} -> ${g.status} ${JSON.stringify(g.body)} exp ${es} ${JSON.stringify(eb)}`);
+}
+// E304: same-account transfer (after two accounts exist).
+handleMessage(state2, "ALTA;Lucia;82");
+handleMessage(state2, "ALTA;Mateo;3");
+// control for TRANSFER;AC-0001;AC-0001;<amt> unknown to the model; use the two known bodies:
+const e304 = handleMessage(state2, "TRANSFER;AC-0001;AC-0001;500;78");
+const ok304 = e304.status === 400 && e304.body.error === "E304";
+if (ok304) pass2++;
+else console.log(`EXTRA FAIL TRANSFER same -> ${e304.status} ${JSON.stringify(e304.body)}`);
+console.log(`extra: ${pass2}/${EXTRA.length + 1}`);
+

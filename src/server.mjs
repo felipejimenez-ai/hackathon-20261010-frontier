@@ -77,6 +77,7 @@ const handlers = {
     const [fromId, toId, amountRaw] = args;
     const amount = parseAmount(amountRaw);
     if (amount === null) return errorBody("E303");
+    if (fromId === toId) return errorBody("E304");
     const from = state.accounts.get(fromId);
     const to = state.accounts.get(toId);
     if (!from || !to) return errorBody("E401");
@@ -113,8 +114,10 @@ export function handleMessage(state, m) {
 
   // PING ignores the control (but still requires it to be present, and arity 0).
   if (cmd !== "PING") {
-    if (!/^\d+$/.test(control)) return errorBody("E201");
+    if (!/^\d{1,2}$/.test(control)) return errorBody("E201");
     if (control.length > 1 && control[0] === "0") return errorBody("E202");
+    const controlNum = Number(control);
+    if (controlNum > 98) return errorBody("E202");
     if (CONFIG.control.mode !== "lenient") {
       const expected = expectedControl(segments.slice(0, -1).join(";"));
       if (expected !== null && Number(control) !== expected) return errorBody("E202");
@@ -182,9 +185,19 @@ export function createServer() {
       try {
         parsed = JSON.parse(raw || "{}");
       } catch {
-        return send(res, 400, { error: "E302", mensaje: CONFIG.errors.E302.mensaje });
+        const e = CONFIG.errors.E100;
+        return send(res, e.status, { error: "E100", mensaje: e.mensaje });
       }
-      const out = handleMessage(state, parsed.m);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || typeof parsed.m !== "string") {
+        const e = CONFIG.errors.E102;
+        return send(res, e.status, { error: "E102", mensaje: e.mensaje });
+      }
+      let out;
+      try {
+        out = handleMessage(state, parsed.m);
+      } catch {
+        out = { status: 400, body: { error: "E302", mensaje: CONFIG.errors.E302.mensaje } };
+      }
       return send(res, out.status, out.body);
     });
   });
@@ -192,6 +205,8 @@ export function createServer() {
 
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
 if (isMain) {
+  process.on("uncaughtException", (e) => console.error("uncaughtException:", e));
+  process.on("unhandledRejection", (e) => console.error("unhandledRejection:", e));
   const server = createServer();
   server.listen(CONFIG.port, "0.0.0.0", () => {
     console.log(`replica listening on 0.0.0.0:${CONFIG.port}`);

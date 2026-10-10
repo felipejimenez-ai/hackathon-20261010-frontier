@@ -1,0 +1,21 @@
+@host = https://caja-negra-production-c64f.up.railway.app
+@token = {{$.env CAJA_NEGRA_TOKEN}}
+@token2 = {{$.env CAJA_NEGRA_TOKEN_2}}
+@entrypoint_token = {{$.env ENTRYPOINT_TOKEN}}
+
+### health
+GET {{host}}/health
+
+### ping
+POST {{host}}/msg
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"m":"PING;64"}
+
+### alta
+POST {{host}}/msg
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"m":"ALTA;Lucia;82"}
