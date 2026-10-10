@@ -1,8 +1,13 @@
 import http from "node:http";
 import { fileURLToPath } from "node:url";
 import { CONFIG } from "./config.mjs";
+import { expectedControl } from "./checksum.mjs";
 
 const pad = (n) => String(n).padStart(CONFIG.idPad, "0");
+
+function parseAmount(raw) {
+  return /^\d+$/.test(raw) ? Number(raw) : null;
+}
 
 function freshState() {
   return {
@@ -56,9 +61,11 @@ const handlers = {
     const [id, amountRaw] = args;
     const acc = state.accounts.get(id);
     if (!acc) return errorBody("E401");
-    const amount = Number(amountRaw);
+    const amount = parseAmount(amountRaw);
+    if (amount === null) return errorBody("E201");
     acc.saldo += amount;
     const op = takeOperation(state, "DEPOSITO");
+    op.undo = () => { acc.saldo -= amount; };
     return { status: 200, body: { status: CONFIG.depositStatus, operacionId: op.id } };
   },
 
@@ -67,12 +74,14 @@ const handlers = {
     const from = state.accounts.get(fromId);
     const to = state.accounts.get(toId);
     if (!from || !to) return errorBody("E401");
-    const amount = Number(amountRaw);
+    const amount = parseAmount(amountRaw);
+    if (amount === null) return errorBody("E201");
     if (amount > CONFIG.transferLimit) return errorBody("E506");
     if (from.saldo < amount) return errorBody("E507");
     from.saldo -= amount;
     to.saldo += amount;
     const op = takeOperation(state, "TRANSFER");
+    op.undo = () => { from.saldo += amount; to.saldo -= amount; };
     return { status: 200, body: { status: CONFIG.depositStatus, operacionId: op.id } };
   },
 
@@ -82,6 +91,8 @@ const handlers = {
     if (!op) return errorBody("E402");
     if (op.annulled) return { status: 200, body: { ok: false, motivo: "ya anulada" } };
     op.annulled = true;
+    // Evidence: samples n16/n19 only fit if ANULA reverses the transfer's balance effects.
+    if (op.undo) op.undo();
     return { status: 200, body: { ok: true, anulada: opId } };
   },
 };
@@ -96,12 +107,18 @@ export function handleMessage(state, m) {
   if (segments.some((s) => s === "")) return errorBody("E104");
 
   const control = segments[segments.length - 1];
-  if (!/^-?\d+$/.test(control)) return errorBody("E201");
+  if (!/^\d+$/.test(control)) return errorBody("E201");
+  if (control.length > 1 && control[0] === "0") return errorBody("E202");
 
   const args = segments.slice(1, -1);
 
   if (!Object.prototype.hasOwnProperty.call(CONFIG.commands, cmd)) return errorBody("E301");
   if (args.length !== CONFIG.commands[cmd]) return errorBody("E302");
+
+  if (CONFIG.control.mode === "hybrid") {
+    const expected = expectedControl(segments.slice(0, -1).join(";"));
+    if (expected !== null && Number(control) !== expected) return errorBody("E202");
+  }
 
   return handlers[cmd](state, args);
 }
@@ -123,6 +140,7 @@ export function createServer() {
     }
 
     let raw = "";
+    req.setEncoding("utf8");
     req.on("data", (c) => (raw += c));
     req.on("end", () => {
       const token = (req.headers["authorization"] || "").replace(/^Bearer\s+/i, "");

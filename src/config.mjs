@@ -12,8 +12,9 @@ export const CONFIG = {
   // controls
   control: {
     // "lenient": accept any numeric control (maximize pass on valid messages).
-    // "model":   validate against derived additive hash (incomplete).
-    mode: process.env.CONTROL_MODE || "lenient",
+    // "hybrid":  E202 only for bodies with a known control (measured table or CONSULTA;AC-#### model);
+    //            everything else lenient.
+    mode: process.env.CONTROL_MODE || "hybrid",
   },
 
   // error contract: code -> { status, mensaje }
