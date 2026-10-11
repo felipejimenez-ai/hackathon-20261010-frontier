@@ -1,0 +1,15 @@
+import fs from "node:fs";
+import { modelControl } from "../src/checksum.mjs";
+const env = Object.fromEntries(fs.readFileSync(".env", "utf8").split(/\r?\n/).map((l) => l.match(/^\s*([^#=\s]+)\s*=\s*(.*)$/)).filter(Boolean).map((m) => [m[1], m[2].replace(/^"|"$/g, "")]));
+const base = "https://hackathon-20261010-frontier-production.up.railway.app";
+const H = { Authorization: "Bearer " + env.ENTRYPOINT_TOKEN, "Content-Type": "application/json" };
+const call = async (p, init = {}) => { const r = await fetch(base + p, { headers: H, ...init }); return r.status + " " + (await r.text()); };
+await call("/__reset", { method: "POST" });
+const good = "ALTA;Zoe Pérez";
+const c = modelControl(good);
+const bad = (c + 7) % 99 || 5;
+const post = (m) => call("/msg", { method: "POST", body: JSON.stringify({ m }) });
+console.log("health", await call("/health"));
+console.log("bad ", await post(`${good};${bad}`));
+console.log("good", await post(`${good};${c}`));
+await call("/__reset", { method: "POST" });
