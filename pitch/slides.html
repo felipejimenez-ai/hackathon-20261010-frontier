@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blackbox Replica — Pitch</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --panel: #0f1620;
+    --line: #1e2a3a;
+    --text: #e6edf3;
+    --dim: #7d8aa0;
+    --cyan: #00e5ff;
+    --green: #39ff88;
+    --amber: #ffb454;
+    --red: #ff5c6c;
+    --mono: "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Fira Code", Consolas, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font-family: var(--mono); color: var(--text); }
+
+  .stage {
+    position: absolute; left: 50%; top: 50%;
+    width: 1920px; height: 1080px;
+    transform-origin: center center;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .stage::before { /* grid */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,229,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.045) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .stage::after { /* scanlines */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 4px);
+    opacity: .5;
+  }
+
+  .slide {
+    position: absolute; inset: 0; padding: 90px 120px 110px;
+    display: none; flex-direction: column;
+    z-index: 1;
+  }
+  .slide.active { display: flex; animation: in .35s ease-out; }
+  @keyframes in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  .tag { color: var(--cyan); font-size: 26px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 20px; }
+  .tag::before { content: "$ "; color: var(--green); }
+  h1, h2 { font-weight: 700; line-height: 1.05; letter-spacing: -.02em; }
+  h1 { font-size: 112px; }
+  h2 { font-size: 78px; margin-bottom: 40px; }
+  .accent { color: var(--cyan); text-shadow: 0 0 24px rgba(0,229,255,.45); }
+  .green { color: var(--green); text-shadow: 0 0 24px rgba(57,255,136,.4); }
+  .dim { color: var(--dim); }
+  .cursor { display: inline-block; width: 0.55em; height: 0.9em; background: var(--cyan); margin-left: 10px; vertical-align: -0.08em; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 36px 40px; }
+  .big-list { list-style: none; font-size: 40px; line-height: 1.35; }
+  .big-list li { padding-left: 1.4em; position: relative; margin-bottom: 18px; }
+  .big-list li::before { content: ">"; position: absolute; left: 0; color: var(--green); }
+
+  .footer { position: absolute; left: 120px; right: 120px; bottom: 36px; display: flex; justify-content: space-between; font-size: 22px; color: var(--dim); z-index: 2; }
+
+  /* slide 1 */
+  .s1 { justify-content: center; }
+  .s1 .row { display: flex; align-items: center; justify-content: space-between; gap: 80px; }
+  .s1 .sub { font-size: 44px; margin-top: 36px; color: var(--dim); line-height: 1.3; max-width: 1000px; }
+  .s1 .rule { margin-top: 44px; display: inline-block; font-size: 34px; border: 1px solid var(--red); color: var(--red); padding: 12px 24px; border-radius: 8px; }
+  .box3d { width: 400px; height: 400px; flex: none; }
+
+  /* slide 2 */
+  .loop { display: flex; align-items: center; gap: 22px; margin-top: 10px; }
+  .step { flex: 1; text-align: center; padding: 40px 18px; }
+  .step .n { font-size: 26px; color: var(--green); margin-bottom: 14px; }
+  .step .t { font-size: 46px; font-weight: 700; color: var(--cyan); }
+  .step .d { font-size: 24px; color: var(--dim); margin-top: 12px; }
+  .arrow { font-size: 60px; color: var(--green); }
+  .callout { margin-top: 56px; font-size: 52px; line-height: 1.25; border-left: 6px solid var(--green); padding-left: 32px; }
+  .stats { display: flex; gap: 28px; margin-top: 50px; }
+  .stat { flex: 1; text-align: center; padding: 26px; }
+  .stat b { display: block; font-size: 64px; color: var(--cyan); }
+  .stat span { font-size: 24px; color: var(--dim); }
+
+  /* slide 3 */
+  .msg { font-size: 64px; text-align: center; padding: 36px; margin-bottom: 40px; }
+  .msg .cmd { color: var(--cyan); } .msg .arg { color: var(--text); } .msg .ctl { color: var(--green); }
+  .msg small { display: block; font-size: 26px; color: var(--dim); margin-top: 12px; }
+  .pipe { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+  .pipe .p { flex: 1; text-align: center; padding: 28px 8px; font-size: 26px; font-weight: 700; border: 1px solid var(--cyan); border-radius: 10px; background: rgba(0,229,255,.06); color: var(--cyan); }
+  .pipe .p.hl { border-color: var(--green); color: var(--green); background: rgba(57,255,136,.08); }
+  .pipe .a { color: var(--dim); font-size: 30px; }
+  .facts { display: flex; gap: 28px; margin-top: 48px; }
+  .facts .panel { flex: 1; font-size: 34px; line-height: 1.3; }
+  .facts .panel b { color: var(--green); }
+
+  /* slide 4 */
+  table.diff { width: 100%; border-collapse: collapse; font-size: 38px; margin-top: 6px; }
+  table.diff th { text-align: left; font-size: 24px; letter-spacing: .15em; text-transform: uppercase; color: var(--dim); padding: 0 24px 16px; }
+  table.diff td { padding: 22px 24px; border-top: 1px solid var(--line); }
+  table.diff td.k { color: var(--dim); width: 26%; }
+  table.diff td.before { color: var(--red); width: 28%; text-decoration: line-through; text-decoration-thickness: 2px; }
+  table.diff td.after { color: var(--green); }
+  .lesson { margin-top: 44px; font-size: 40px; display: flex; gap: 30px; }
+  .lesson .panel { flex: 1; font-size: 34px; line-height: 1.3; }
+  .lesson b { color: var(--cyan); }
+
+  /* slide 5 */
+  .s5 .grid { display: grid; grid-template-columns: 560px 1fr; gap: 50px; align-items: stretch; }
+  .score { text-align: center; padding: 30px 20px; display: flex; flex-direction: column; justify-content: center; }
+  .score .num { font-size: 230px; font-weight: 700; line-height: 1; color: var(--green); text-shadow: 0 0 40px rgba(57,255,136,.5); }
+  .score .num small { font-size: 100px; color: var(--dim); text-shadow: none; }
+  .score .lbl { font-size: 28px; letter-spacing: .15em; color: var(--dim); margin-top: 14px; text-transform: uppercase; }
+  .bars { display: flex; flex-direction: column; gap: 26px; }
+  .bar .head { display: flex; justify-content: space-between; font-size: 32px; margin-bottom: 10px; }
+  .bar .head b { color: var(--cyan); }
+  .bar .track { height: 30px; background: #141d2b; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .bar .fill { height: 100%; border-radius: 5px; }
+  .bar.easy .fill { background: var(--green); }
+  .bar.med .fill { background: var(--cyan); }
+  .bar.hard .fill { background: var(--amber); }
+  .s5 .row2 { display: grid; grid-template-columns: 560px 1fr 1fr; gap: 28px; margin-top: 34px; }
+  .s5 .grid { min-height: 420px; }
+  .s5 .row2 { margin-top: 40px; }
+  .s5 .row2 .panel { padding: 28px 32px; min-height: 360px; }
+  .runs svg { width: 100%; height: 270px; display: block; }
+  .mini b { display: block; font-size: 84px; color: var(--cyan); margin-top: 20px; }
+  .mini span { font-size: 28px; color: var(--dim); line-height: 1.3; display: block; margin-top: 4px; }
+  .mini.warn b { color: var(--amber); }
+
+  /* ui */
+  .hud { position: absolute; right: 24px; top: 14px; z-index: 5; font-size: 18px; color: #3a4658; user-select: none; }
+
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { overflow: visible; background: var(--bg); height: auto; }
+    .stage { position: static; transform: none !important; width: 1920px; height: auto; overflow: visible; }
+    .stage::before, .stage::after, .hud { display: none; }
+    .slide { display: flex !important; position: relative; width: 1920px; height: 1080px; page-break-after: always; break-after: page; animation: none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 1. PROBLEM -->
+  <section class="slide s1 active">
+    <div class="row">
+      <div>
+        <div class="tag" data-i18n="tag1"></div>
+        <h1>Blackbox<br><span class="accent">Replica</span><span class="cursor"></span></h1>
+        <p class="sub" data-i18n="sub1"></p>
+        <div class="rule" data-i18n="rule1"></div>
+      </div>
+      <svg class="box3d" viewBox="0 0 400 400" fill="none" stroke="#00e5ff" stroke-width="3">
+        <polygon points="200,40 350,115 350,285 200,360 50,285 50,115" fill="#0f1620"/>
+        <polyline points="50,115 200,190 350,115"/>
+        <line x1="200" y1="190" x2="200" y2="360"/>
+        <text x="200" y="300" text-anchor="middle" font-size="150" fill="#39ff88" stroke="none" font-family="monospace" font-weight="700">?</text>
+      </svg>
+    </div>
+    <div class="footer"><span data-bind="team"></span><span data-i18n="foot1"></span></div>
+  </section>
+
+  <!-- 2. METHOD -->
+  <section class="slide s2">
+    <div class="tag" data-i18n="tag2"></div>
+    <h2 data-i18n="h2_2"></h2>
+    <div class="loop">
+      <div class="panel step"><div class="n">01</div><div class="t" data-i18n="probe"></div><div class="d" data-i18n="probeD"></div></div>
+      <div class="arrow">→</div>
+      <div class="panel step"><div class="n">02</div><div class="t" data-i18n="log"></div><div class="d" data-i18n="logD"></div></div>
+      <div class="arrow">→</div>
+      <div class="panel step"><div class="n">03</div><div class="t" data-i18n="infer"></div><div class="d" data-i18n="inferD"></div></div>
+      <div class="arrow">→</div>
+      <div class="panel step"><div class="n">04</div><div class="t" data-i18n="rebuild"></div><div class="d" data-i18n="rebuildD"></div></div>
+    </div>
+    <div class="callout" data-i18n="callout2"></div>
+    <div class="stats">
+      <div class="panel stat"><b>100</b><span data-i18n="st1"></span></div>
+      <div class="panel stat"><b>10/s</b><span data-i18n="st2"></span></div>
+      <div class="panel stat"><b>3 MB</b><span data-i18n="st3"></span></div>
+    </div>
+    <div class="footer"><span data-bind="team"></span><span>02 / 05</span></div>
+  </section>
+
+  <!-- 3. FINDINGS -->
+  <section class="slide s3">
+    <div class="tag" data-i18n="tag3"></div>
+    <h2 data-i18n="h2_3"></h2>
+    <div class="panel msg">
+      <span class="cmd">TRANSFER</span><span class="dim">;</span><span class="arg">AC-0001</span><span class="dim">;</span><span class="arg">AC-0002</span><span class="dim">;</span><span class="arg">40000</span><span class="dim">;</span><span class="ctl">86</span>
+      <small data-i18n="msgsmall"></small>
+    </div>
+    <div class="pipe">
+      <div class="p" data-i18n="p1"></div><div class="a">›</div>
+      <div class="p" data-i18n="p2"></div><div class="a">›</div>
+      <div class="p" data-i18n="p3"></div><div class="a">›</div>
+      <div class="p hl" data-i18n="p4"></div><div class="a">›</div>
+      <div class="p" data-i18n="p5"></div><div class="a">›</div>
+      <div class="p" data-i18n="p6"></div><div class="a">›</div>
+      <div class="p" data-i18n="p7"></div><div class="a">›</div>
+      <div class="p" data-i18n="p8"></div>
+    </div>
+    <div class="facts">
+      <div class="panel" data-i18n="f1"></div>
+      <div class="panel" data-i18n="f2"></div>
+      <div class="panel" data-i18n="f3"></div>
+    </div>
+    <div class="footer"><span data-bind="team"></span><span>03 / 05</span></div>
+  </section>
+
+  <!-- 4. INCIDENT -->
+  <section class="slide s4">
+    <div class="tag" data-i18n="tag4"></div>
+    <h2 data-i18n="h2_4"></h2>
+    <table class="diff">
+      <tr><th data-i18n="th1"></th><th data-i18n="th2"></th><th data-i18n="th3"></th></tr>
+      <tr><td class="k" data-i18n="k1"></td><td class="before">2100</td><td class="after">"2100.00"</td></tr>
+      <tr><td class="k" data-i18n="k2"></td><td class="before">100000</td><td class="after">50000</td></tr>
+      <tr><td class="k" data-i18n="k3"></td><td class="before">&mdash;</td><td class="after">E303 E304 E100 E102 E103</td></tr>
+      <tr><td class="k">ANULA</td><td class="before" data-i18n="b4"></td><td class="after" data-i18n="a4"></td></tr>
+    </table>
+    <div class="lesson">
+      <div class="panel" data-i18n="l1"></div>
+      <div class="panel" data-i18n="l2"></div>
+    </div>
+    <div class="footer"><span data-bind="team"></span><span>04 / 05</span></div>
+  </section>
+
+  <!-- 5. RESULTS -->
+  <section class="slide s5">
+    <div class="tag" data-i18n="tag5"></div>
+    <div class="grid">
+      <div class="panel score">
+        <div class="num"><span data-bind="pass"></span><small>/100</small></div>
+        <div class="lbl" data-i18n="lbl5"></div>
+      </div>
+      <div class="panel bars">
+        <div class="bar easy"><div class="head"><span data-i18n="easy"></span><b data-bind="easy"></b></div><div class="track"><div class="fill" data-pct="easy"></div></div></div>
+        <div class="bar med"><div class="head"><span data-i18n="med"></span><b data-bind="med"></b></div><div class="track"><div class="fill" data-pct="med"></div></div></div>
+        <div class="bar hard"><div class="head"><span data-i18n="hard"></span><b data-bind="hard"></b></div><div class="track"><div class="fill" data-pct="hard"></div></div></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="panel runs">
+        <div class="dim" style="font-size:22px;margin-bottom:6px" data-i18n="runs"></div>
+        <svg viewBox="0 0 500 270" id="runs"></svg>
+      </div>
+      <div class="panel mini"><b>325 ms</b><span data-i18n="ms"></span></div>
+      <div class="panel mini warn"><b data-i18n="failsN"></b><span data-i18n="fails"></span></div>
+    </div>
+    <div class="footer"><span data-bind="repo"></span><span data-bind="team"></span></div>
+  </section>
+
+  <div class="hud" data-i18n="hud"></div>
+</div>
+
+<script>
+  // ===== EDIT HERE =====
+  const CONFIG = {
+    team: "[FELIPE JIMÉNEZ]",
+    repo: "[https://github.com/felipejimenez-ai/hackathon-20261010-frontier]",
+    pass: 71,
+    easy: [35, 40],
+    med:  [29, 40],
+    hard: [7, 20],
+    runs: [["15:05", 42], ["18:08", 63], ["20:02", 71]],
+  };
+  // =====================
+
+  document.querySelectorAll("[data-bind]").forEach(el => {
+    const v = CONFIG[el.dataset.bind];
+    el.textContent = Array.isArray(v) ? v[0] + " / " + v[1] : v;
+  });
+  document.querySelectorAll("[data-pct]").forEach(el => {
+    const [a, b] = CONFIG[el.dataset.pct];
+    el.style.width = (a / b * 100) + "%";
+  });
+
+  // ===== i18n (EN default; L toggles; ?lang=es|en) =====
+  const I18N = {
+    en: {
+      tag1: "01 / the problem",
+      sub1: "We cloned a 10-year-old service<br>we couldn't open.",
+      rule1: "NEVER calls the original. Ever.",
+      foot1: "no source · no docs · 2 authors gone",
+      tag2: "02 / the method",
+      h2_2: 'Ask the <span class="accent">oracle</span>',
+      probe: "Probe", probeD: "fire requests",
+      log: "Log", logD: "every pair saved",
+      infer: "Infer", inferD: "find the rules",
+      rebuild: "Rebuild", rebuildD: "our own server",
+      callout2: 'Learn the <span class="green">rules</span>,<br>not the answers.',
+      st1: "hidden tests we never saw",
+      st2: "request budget",
+      st3: "experiment log, line per probe",
+      tag3: "03 / what we found",
+      h2_3: 'One message format.<br>One <span class="green">hidden checksum</span>.',
+      msgsmall: "COMMAND ; args ; control &mdash; control = mod-97 checksum",
+      p1: "Entry", p2: "Token", p3: "Parser", p4: "Integrity", p5: "Dispatch", p6: "Handlers", p7: "State", p8: "Serializer",
+      f1: "<b>Per-token</b> in-memory state",
+      f2: "<b>Same bytes</b>: status, body, typos",
+      f3: "<b>Every rule</b> cites a log line",
+      tag4: "04 / the incident",
+      h2_4: 'The service <span class="accent">changed</span> mid-day.',
+      th1: "What", th2: "Before", th3: "After (v2)",
+      k1: "Balance", k2: "Transfer limit", k3: "New errors",
+      b4: "no revert", a4: "reverts balances",
+      l1: "<b>Detected</b> by differential tests vs the oracle.",
+      l2: "<b>Lesson:</b> parameters live in config, never hardcoded.",
+      tag5: "05 / results",
+      lbl5: "hidden tests passed",
+      easy: "Easy", med: "Medium", hard: "Hard",
+      runs: "RUNS 15:05 → 18:08 → 20:02",
+      ms: "median per case<br>(limit: 5 s)",
+      failsN: "29 fails",
+      fails: "15 on the first request<br>14 later in the sequence<br><br>Next target: hard sequences (7/20)",
+      hud: "← → space · F fullscreen · L language",
+    },
+    es: {
+      tag1: "01 / el problema",
+      sub1: "Clonamos un servicio de 10 años<br>que no podíamos abrir.",
+      rule1: "NUNCA llama al original. Jamás.",
+      foot1: "Hackathon · Frontier - Lab10 · 2026/10/10",
+      tag2: "02 / el método",
+      h2_2: 'Pregúntale al <span class="accent">oráculo</span>',
+      probe: "Sondear", probeD: "enviar requests",
+      log: "Registrar", logD: "cada par guardado",
+      infer: "Inferir", inferD: "hallar las reglas",
+      rebuild: "Reconstruir", rebuildD: "servidor propio",
+      callout2: 'Aprende las <span class="green">reglas</span>,<br>no las respuestas.',
+      st1: "tests ocultos que nunca vimos",
+      st2: "límite de requests",
+      st3: "log de experimentos, línea por sonda",
+      tag3: "03 / lo que encontramos",
+      h2_3: 'Un formato de mensaje.<br>Un <span class="green">checksum oculto</span>.',
+      msgsmall: "COMANDO ; args ; control &mdash; control = checksum mod-97",
+      p1: "Entrada", p2: "Token", p3: "Parser", p4: "Integridad", p5: "Dispatch", p6: "Handlers", p7: "Estado", p8: "Serializer",
+      f1: "Estado en memoria <b>por token</b>",
+      f2: "<b>Mismos bytes</b>: status, cuerpo, typos",
+      f3: "<b>Cada regla</b> cita una línea del log",
+      tag4: "04 / el incidente",
+      h2_4: 'El servicio <span class="accent">cambió</span> a media jornada.',
+      th1: "Qué", th2: "Antes", th3: "Después (v2)",
+      k1: "Saldo", k2: "Límite transf.", k3: "Errores nuevos",
+      b4: "sin reversa", a4: "revierte saldos",
+      l1: "<b>Detectado</b> con tests diferenciales contra el oráculo.",
+      l2: "<b>Lección:</b> los parámetros van en config, nunca hardcodeados.",
+      tag5: "05 / resultados",
+      lbl5: "tests ocultos aprobados",
+      easy: "Fácil", med: "Regular", hard: "Difícil",
+      runs: "CORRIDAS 15:05 → 18:08 → 20:02",
+      ms: "mediana por caso<br>(límite: 5 s)",
+      failsN: "29 fallos",
+      fails: "15 en el primer request<br>14 más adelante<br><br>Siguiente: secuencias difíciles (7/20)",
+      hud: "← → espacio · F pantalla completa · L idioma",
+    },
+  };
+  let lang = (new URLSearchParams(location.search).get("lang") || (function () { try { return localStorage.getItem("lang"); } catch (e) { return null; } })() || "en");
+  if (!I18N[lang]) lang = "en";
+  function setLang(l) {
+    lang = l;
+    document.documentElement.lang = l;
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.innerHTML = I18N[l][el.dataset.i18n]; });
+    document.title = l === "es" ? "Blackbox Replica — Pitch (ES)" : "Blackbox Replica — Pitch";
+    try { localStorage.setItem("lang", l); } catch (e) {}
+  }
+  setLang(lang);
+
+  // runs line chart
+  (function () {
+    const svg = document.getElementById("runs");
+    const r = CONFIG.runs, W = 500, H = 270, pad = 40;
+    const x = i => pad + i * (W - 2 * pad) / (r.length - 1);
+    const y = v => H - 40 - v / 100 * (H - 80);
+    let s = '<polyline fill="none" stroke="#00e5ff" stroke-width="4" points="' + r.map((p, i) => x(i) + "," + y(p[1])).join(" ") + '"/>';
+    r.forEach((p, i) => {
+      s += '<circle cx="' + x(i) + '" cy="' + y(p[1]) + '" r="8" fill="#39ff88"/>';
+      s += '<text x="' + x(i) + '" y="' + (y(p[1]) - 16) + '" text-anchor="middle" font-size="26" font-weight="700" fill="#e6edf3" font-family="monospace">' + p[1] + '</text>';
+      s += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="20" fill="#7d8aa0" font-family="monospace">' + p[0] + '</text>';
+    });
+    svg.innerHTML = s;
+  })();
+
+  // scaling
+  const stage = document.getElementById("stage");
+  function fit() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = "translate(-50%,-50%) scale(" + s + ")";
+  }
+  addEventListener("resize", fit); fit();
+
+  // navigation
+  const slides = [...document.querySelectorAll(".slide")];
+  let cur = 0;
+  function go(n) {
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((el, i) => el.classList.toggle("active", i === cur));
+    history.replaceState(null, "", "#" + (cur + 1));
+  }
+  addEventListener("keydown", e => {
+    if (["ArrowRight", "ArrowDown", " ", "PageDown", "Enter"].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(slides.length - 1);
+    else if (e.key.toLowerCase() === "l") setLang(lang === "es" ? "en" : "es");
+    else if (e.key.toLowerCase() === "f") {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    }
+  });
+  addEventListener("click", e => go(e.clientX < innerWidth / 3 ? cur - 1 : cur + 1));
+  const h = parseInt(location.hash.slice(1), 10);
+  if (h >= 1 && h <= slides.length) go(h - 1);
+</script>
+</body>
+</html>
