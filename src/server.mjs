@@ -155,8 +155,10 @@ function handleRequest(req, res) {
     const path = (req.url || "/").split("?")[0];
     const method = req.method || "GET";
 
-    // Readiness probe: responds 200 without auth (entrypoint validation).
+    // Readiness probe. Original: with a token -> 200 {"ok":true}; without -> 401 E001 (log 9000).
+    // Deviation: no-token probes (Railway healthcheck) still get 200 so the platform keeps the service up.
     if (method === "GET" && path === "/health") {
+      if (/^Bearer\s+\S+/i.test(req.headers["authorization"] || "")) return send(res, 200, { ok: true });
       res.writeHead(200, { "Content-Type": "text/plain" });
       return res.end("ok");
     }

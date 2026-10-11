@@ -17,10 +17,9 @@ export const CONFIG = {
   currencyDivisor: 100,
 
   // controls
-  control: {    // "lenient": accept any numeric control (maximize pass on valid messages).
-    // "hybrid":  E202 only for bodies with a known control (measured table or CONSULTA;AC-#### model);
-    //            everything else lenient.
-    mode: process.env.CONTROL_MODE || "hybrid",
+  control: {    // "strict" (default): E202 unless control equals the closed mod-97 model (src/checksum.mjs).
+    // "lenient": accept any numeric control (debug only).
+    mode: process.env.CONTROL_MODE || "strict",
   },
 
   // auth: allowed bearer tokens. Observed: original rejects unknown tokens with 401 E001.
