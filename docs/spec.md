@@ -61,6 +61,11 @@ letras** (`CONSULTA;J`=98 pero `CONSULTA;JJ`=68, `CONSULTA;AJ`=68): la combinaci
 Dispatch **insensible a mayúsculas** en el nombre del comando (`CONSULta` ≡ `CONSULTA`). Los ids de
 cuenta/operación son sensibles a mayúscula en la búsqueda (`ac-0001` ≠ `AC-0001`).
 
+> **Unidades (v2):** los `monto` de `DEPOSITO`/`TRANSFER` están en **centavos**, y el saldo se
+> **muestra** en unidades de moneda (`centavos/100`). Ej.: `DEPOSITO;AC-0001;250000;86` acredita
+> 250000 centavos y `CONSULTA` responde `"2500.00"`. Reformatos puros: `40000`→`"400.00"`,
+> `40700`→`"407.00"`, `0`→`"0.00"` (evidencia 7915, 7918, 7929, 7951, 7953).
+
 ### `PING`
 | ID | Comportamiento | Evidencia | Confianza |
 |----|----------------|-----------|-----------|

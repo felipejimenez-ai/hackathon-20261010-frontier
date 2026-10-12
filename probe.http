@@ -1,82 +1,100 @@
 @original  = https://caja-negra-production-c64f.up.railway.app
-
 @replica   = https://hackathon-20261010-frontier-production.up.railway.app
 
-# tokens desde .env
-@origToken = {{$dotenv CAJA_NEGRA_TOKEN_2}}
+# tokens from .env
+@origToken = {{$dotenv CAJA_NEGRA_TOKEN}}
 @teamToken = {{$dotenv ENTRYPOINT_TOKEN}}
 
 @ct = application/json
 
+# NOTE: the original no longer accepts participant tokens (cutoff 20:00).
+# The `original` blocks are kept for reference and will return 401 E001.
+
 ###############################################################################
-# HEALTH  (no necesita token)
+# HEALTH  (no token needed)
 ###############################################################################
 
-### réplica health
+### replica health  -> 200 {"ok":true}
 GET {{replica}}/health
 
 ### original health
 GET {{original}}/health
 
 ###############################################################################
-# RESET  (vacía el estado del token — manda esto ANTES de cada secuencia)
+# RESET  (wipe this token's state — send this BEFORE each sequence)
 ###############################################################################
 
-### réplica reset
+### replica reset  -> 200 {"ok":true}
 POST {{replica}}/__reset
 Authorization: Bearer {{teamToken}}
 
-### original reset   (da 401 después de las 20:00)
+### original reset  (401 after 20:00)
 POST {{original}}/__reset
 Authorization: Bearer {{origToken}}
 
 ###############################################################################
-# SECUENCIA VÁLIDA  (manda en este orden, tras el reset)
+# DEMO SEQUENCE  (click in this order, after the reset above)
+# Verified against the deployed replica on 2026-10-11.
 ###############################################################################
 
-### 1. PING
-POST {{replica}}/msg
-Authorization: Bearer {{teamToken}}
-Content-Type: {{ct}}
-
-{"m":"PING;64"}
-
-### 2. ALTA Lucia  -> 201 AC-0001
+### 1. ALTA Lucia  -> 201 {"cuentaId":"AC-0001"}
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
 {"m":"ALTA;Lucia;82"}
 
-### 3. CONSULTA AC-0001 -> saldo 0
+### 2. ALTA Mateo  -> 201 {"cuentaId":"AC-0002"}
+# Needed before any TRANSFER: a transfer to a missing account returns E401.
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"ALTA;Mateo;3"}
+
+### 3. CONSULTA AC-0001  -> 200 saldo "0.00"
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
 {"m":"CONSULTA;AC-0001;14"}
 
-### 4. DEPOSITO 250000 -> recieved (typo incluido)
+### 4. DEPOSITO 250000  -> 200 "recieved" (typo preserved), OP-0001
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
 {"m":"DEPOSITO;AC-0001;250000;86"}
 
-### 5. TRANSFER 40000 -> recieved
+### 5. CONSULTA AC-0001  -> 200 saldo "2500.00" (decimal string, v2)
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"CONSULTA;AC-0001;14"}
+
+### 6. TRANSFER 40000  -> 200 "recieved", OP-0002
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
 {"m":"TRANSFER;AC-0001;AC-0002;40000;86"}
 
-### 6. ANULA OP-0002 -> ok true
+### 7. CONSULTA AC-0002  -> 200 saldo "400.00"
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"CONSULTA;AC-0002;11"}
+
+### 8. ANULA OP-0002  -> 200 {"ok":true,"anulada":"OP-0002"}
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
 {"m":"ANULA;OP-0002;66"}
 
-### 7. ANULA OP-0002 otra vez -> ok false "ya anulada"
+### 9. ANULA OP-0002 again  -> 200 {"ok":false,"motivo":"ya anulada"}
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
@@ -84,24 +102,31 @@ Content-Type: {{ct}}
 {"m":"ANULA;OP-0002;66"}
 
 ###############################################################################
-# ERRORES  (cada uno prueba un código distinto)
+# ERRORS  (each one proves a different code)
 ###############################################################################
 
-### E202 control inválido
+### PING;64  -> 200 {"pong":true}   (PING skips the checksum)
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
-{"m":"ALTA;Lucia;83"}
+{"m":"PING;64"}
+
+### E103 falta control  -> 400 {"error":"E103","mensaje":"falta control"}
+POST {{replica}}/msg
+Authorization: Bearer {{teamToken}}
+Content-Type: {{ct}}
+
+{"m":"PING"}
 
 ### E201 control mal formado
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
 
-{"m":"DEPOSITO;AC-0002;700;5X"}
+{"m":"DEPOSITO;AC-0001;700;5X"}
 
-### E301 comando desconocido (espacio final)
+### E301 comando desconocido (trailing space preserved)
 POST {{replica}}/msg
 Authorization: Bearer {{teamToken}}
 Content-Type: {{ct}}
@@ -137,20 +162,20 @@ Content-Type: {{ct}}
 {"m":"TRANSFER;AC-0002;AC-0001;50000;23"}
 
 ###############################################################################
-# CASOS ESPECIALES
+# SPECIAL CASES
 ###############################################################################
 
-### ruta inexistente -> E404
+### unknown route -> 404 {"error":"E404","mensaje":"ruta desconocida"}
 GET {{replica}}/nope
 
-### token malo -> E001
+### bad token -> 401 {"error":"E001","mensaje":"no autorizado"}
 POST {{replica}}/msg
-Authorization: Bearer token-falso
+Authorization: Bearer bad-token-xyz
 Content-Type: {{ct}}
 
 {"m":"PING;64"}
 
-### sin token -> E001
+### no token -> 401 {"error":"E001","mensaje":"no autorizado"}
 POST {{replica}}/msg
 Content-Type: {{ct}}
 
