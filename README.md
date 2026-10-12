@@ -35,17 +35,11 @@ Would you apply to a challenge like this?
 
 ## Watch the 2-minute pitch
 
-<video src="docs-hackathon/demo/hackathon-20261010-frontier-pitch.mp4" controls preload="metadata" width="100%"></video>
-
-▶️ [Download / open the pitch video](docs-hackathon/demo/hackathon-20261010-frontier-pitch.mp4)
+https://github.com/user-attachments/assets/10c742d9-555f-451b-a132-0619b616a43e
 
 ## Technical demo
 
-<video src="docs-hackathon/demo/technical-demo.mp4" controls preload="metadata" width="100%"></video>
-
-▶️ [Download / open the technical demo](docs-hackathon/demo/technical-demo.mp4)
-
-> **Note:** these MP4s are large (~113 MB and ~248 MB). GitHub's inline player only renders videos uploaded through the github.com web editor (drag-and-drop produces a `user-attachments` URL); plain repo files may not autoplay there, and files over 100 MB need Git LFS to push. Swap each `src` for the drag-drop URL if you want them to play inline on GitHub.
+https://github.com/user-attachments/assets/73ce737d-e86a-4e8b-b498-1d0fd38d6167
 
 ---
 
